@@ -35,7 +35,7 @@ func main() {
 }
 
 func migrate() {
-	err := config.DB.AutoMigrate(&entities.User{})
+	err := config.DB.AutoMigrate(&entities.User{}, &entities.Image{})
 	if err != nil {
 		panic(err)
 	}
