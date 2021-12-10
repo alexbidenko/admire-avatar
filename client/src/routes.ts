@@ -2,8 +2,8 @@ import {createWebHistory, createRouter} from 'vue-router';
 import AuthLayout from './layout/AuthLayout.vue';
 import AuthPage from './pages/AuthPage.vue';
 import RegistrationPage from './pages/RegistrationPage.vue';
-import Main from '~/pages/MainPage.vue';
-import GenerateImagePage from '~/pages/GenerateImagePage.vue';
+import MainPage from '~/pages/MainPage.vue';
+import GeneratePage from '~/pages/GeneratePage.vue';
 import PrintsPage from '~/pages/PrintsPage.vue';
 
 const routes = [
@@ -25,12 +25,12 @@ const routes = [
       {
         path: '/',
         name: 'main',
-        component: Main,
+        component: MainPage,
       },
       {
-        path: '/generateImages',
-        name: 'generateImages',
-        component: GenerateImagePage,
+        path: '/generate',
+        name: 'generate',
+        component: GeneratePage,
       },
       {
         path: '/prints',
