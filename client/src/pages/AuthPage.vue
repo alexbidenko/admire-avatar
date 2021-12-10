@@ -5,7 +5,7 @@ import {
 </script>
 
 <template>
-  <n-card title="Auth">
-    Main
+  <n-card title="Auth pagggg">
+    Auth page
   </n-card>
 </template>

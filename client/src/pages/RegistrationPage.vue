@@ -5,7 +5,7 @@ import {
 </script>
 
 <template>
-  <n-card title="Auth">
-    Main
+  <n-card title="Reg">
+    Reg page
   </n-card>
 </template>
