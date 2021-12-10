@@ -1,5 +1,7 @@
 <script setup lang="ts"></script>
 
 <template>
-  <p>Main huy</p>
+  <h1>List Images</h1>
 </template>
+
+<style lang="scss" scoped></style>
