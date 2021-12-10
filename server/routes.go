@@ -15,7 +15,9 @@ func initRoutes() http.Handler {
 	s.HandleFunc("/user/sign-in", controllers.SignIn).Methods("POST")
 	s.HandleFunc("/user/logout", controllers.Logout).Methods("POST")
 	s.HandleFunc("/user/refresh", controllers.Refresh).Methods("POST")
-	s.HandleFunc("/user/change-password", middlewares.Auth(controllers.ChangePassword)).Methods("POST")
+	s.HandleFunc("/user/password", middlewares.Auth(controllers.ChangePassword)).Methods("POST")
+	s.HandleFunc("/user", middlewares.Auth(controllers.GetUserByToken)).Methods("GET")
+	s.HandleFunc("/user/change", middlewares.Auth(controllers.ChangeUser)).Methods("POST")
 
 	return r
 }

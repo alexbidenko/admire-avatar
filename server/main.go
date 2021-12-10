@@ -2,6 +2,7 @@ package main
 
 import (
 	"admire-avatar/config"
+	"admire-avatar/entities"
 	"fmt"
 	"log"
 	"net/http"
@@ -34,5 +35,8 @@ func main() {
 }
 
 func migrate() {
-
+	err := config.DB.AutoMigrate(&entities.User{})
+	if err != nil {
+		panic(err)
+	}
 }

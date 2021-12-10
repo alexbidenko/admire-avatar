@@ -4,6 +4,7 @@ import (
 	"admire-avatar/config"
 	"admire-avatar/utils"
 	"net/http"
+	"strconv"
 )
 
 func Auth(handler http.HandlerFunc) http.HandlerFunc {
@@ -20,7 +21,7 @@ func Auth(handler http.HandlerFunc) http.HandlerFunc {
 			return
 		}
 
-		r.Header.Set("Email", claims.Email)
+		r.Header.Set("Id", strconv.Itoa(int(claims.ID)))
 		handler.ServeHTTP(w, r)
 	}
 }

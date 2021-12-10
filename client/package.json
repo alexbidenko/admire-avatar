@@ -4,7 +4,9 @@
   "scripts": {
     "dev": "vite",
     "build": "vue-tsc --noEmit && vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "lint:es": "eslint --ext .ts,.vue --ignore-path .gitignore .",
+    "lint:es:fix": "eslint --fix --ext .ts,.vue --ignore-path .gitignore ."
   },
   "dependencies": {
     "vue": "^3.2.23"

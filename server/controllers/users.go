@@ -46,13 +46,16 @@ func ChangeUser(w http.ResponseWriter, r *http.Request) {
 	var changedUser entities.User
 	utils.ParseRequestBody(w, r, &changedUser)
 
-	user, err := userModule.GetByEmail(r.Header.Get("Email"))
+	user, err := userModule.Find(r.Header.Get("Id"))
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusNotFound)
 		return
 	}
 	if changedUser.Name != "" {
 		user.Name = changedUser.Name
+	}
+	if changedUser.Email != "" {
+		user.Email = changedUser.Email
 	}
 
 	userModule.Update(user.ID, &user)
