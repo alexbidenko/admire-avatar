@@ -1,6 +1,25 @@
 <script setup lang="ts">
+import {ref} from 'vue';
 import {NImage, NIcon, NButton} from 'naive-ui';
 import {SaveRound, ArrowForwardFilled} from '@vicons/material';
+import {generateImage, saveImage} from '~/api/images';
+
+const image = ref('');
+
+const nextImage = () => {
+  generateImage({
+    phrase: 'test',
+    tags: ['test', 'tag'],
+  }).then(({data}) => {
+    image.value = data.source;
+  });
+};
+
+const likeImage = () => {
+  saveImage({source: image.value}).then(() => {
+    alert('Картинка сохранена');
+  });
+};
 </script>
 
 <template>
@@ -12,12 +31,12 @@ import {SaveRound, ArrowForwardFilled} from '@vicons/material';
       />
     </div>
     <div class="buttonsContainer">
-      <n-button class="buttonAction" strong secondary circle>
+      <n-button @click="likeImage" class="buttonAction" strong secondary circle>
         <n-icon>
           <SaveRound />
         </n-icon>
       </n-button>
-      <n-button class="buttonAction" strong secondary circle>
+      <n-button @click="nextImage" class="buttonAction" strong secondary circle>
         <n-icon>
           <ArrowForwardFilled />
         </n-icon>
