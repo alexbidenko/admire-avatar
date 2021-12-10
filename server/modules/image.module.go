@@ -14,6 +14,12 @@ func (i *ImageModule) Get(userID uint) []entities.Image {
 	return images
 }
 
+func (i *ImageModule) GetAvatar(userID uint) (entities.Image, error) {
+	var image entities.Image
+	err := config.DB.Model(&entities.Image{}).Where("user_id = ?", userID).Where("main = ?", true).Find(&image).Error
+	return image, err
+}
+
 func (i *ImageModule) Find(userID uint, imageID string) (entities.Image, error) {
 	var image entities.Image
 	err := config.DB.Model(&entities.Image{}).Where("user_id = ?", userID).Where("id = ?", imageID).First(&image).Error

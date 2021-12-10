@@ -11,6 +11,7 @@ import (
 	"github.com/google/uuid"
 	"github.com/gorilla/mux"
 	"io"
+	"io/ioutil"
 	"net/http"
 	"os"
 	"strings"
@@ -100,10 +101,60 @@ func RemoveImage(w http.ResponseWriter, r *middlewares.AuthorizedRequest) {
 	utils.WriteJsonResponse(w, true)
 }
 
+func GetImage(w http.ResponseWriter, r *middlewares.AuthorizedRequest) {
+	var imageModule modules.ImageModule
+	id := mux.Vars(r.Request)["id"]
+
+	image, err := imageModule.Find(r.User.ID, id)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusNotFound)
+		return
+	}
+
+	fileBytes, err := ioutil.ReadFile("image/avatars/" + image.Source)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusNotFound)
+		return
+	}
+
+	_, err = w.Write(fileBytes)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+	}
+}
+
+func GetImageByEmail(w http.ResponseWriter, r *http.Request) {
+	var userModule modules.UserModule
+	var imageModule modules.ImageModule
+	emailHash := mux.Vars(r)["emailHash"]
+
+	user, err := userModule.GetByHash(emailHash)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusNotFound)
+		return
+	}
+	image, err := imageModule.GetAvatar(user.ID)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusNotFound)
+		return
+	}
+
+	fileBytes, err := ioutil.ReadFile("image/avatars/" + image.Source)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusNotFound)
+		return
+	}
+
+	_, err = w.Write(fileBytes)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+	}
+}
+
 func downloadFile(data GeneratedImage) (string, error) {
 	body, err := json.Marshal(data)
 
-	resp, err := http.Post("", "application/json", bytes.NewBuffer(body))
+	resp, err := http.Post("http://192.168.43.7:8000/images/", "application/json", bytes.NewBuffer(body))
 	if err != nil {
 		return "", err
 	}

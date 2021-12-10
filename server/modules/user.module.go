@@ -32,6 +32,12 @@ func (userModule *UserModule) GetByEmail(email string) (entities.User, error) {
 	return user, err
 }
 
+func (userModule *UserModule) GetByHash(emailHash string) (entities.User, error) {
+	var user entities.User
+	err := config.DB.Model(&entities.User{}).First(&user, "email_hash = ?", emailHash).Error
+	return user, err
+}
+
 func (userModule *UserModule) Find(ID uint) (entities.User, error) {
 	var user entities.User
 	err := config.DB.Model(&entities.User{}).First(&user, "id = ?", ID).Error

@@ -6,6 +6,8 @@ import (
 	"admire-avatar/modules"
 	"admire-avatar/utils"
 	"context"
+	"crypto/md5"
+	"fmt"
 	"golang.org/x/crypto/bcrypt"
 	"net/http"
 	"os"
@@ -34,6 +36,7 @@ func SignUp(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	user.Password = string(bytes)
+	user.EmailHash = fmt.Sprintf("%x", md5.Sum([]byte(user.Email)))
 
 	userModule.Create(&user)
 
