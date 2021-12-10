@@ -4,9 +4,12 @@ import (
 	"admire-avatar/config"
 	"admire-avatar/entities"
 	"fmt"
+	"io/ioutil"
 	"log"
 	"net/http"
 	"os"
+	"path/filepath"
+	"time"
 )
 
 func main() {
@@ -26,6 +29,23 @@ func main() {
 
 	routes := initRoutes()
 	http.Handle("/", routes)
+
+	go func() {
+		files, err := ioutil.ReadDir("files/temporary")
+		if err != nil {
+			fmt.Println(err)
+			return
+		}
+
+		for _, file := range files {
+			if file.Mode().IsRegular() && filepath.Ext(file.Name()) == "png" && time.Now().Sub(file.ModTime()) > 2*time.Hour {
+				err = os.Remove("files/images/" + file.Name())
+				if err != nil {
+					fmt.Println(err)
+				}
+			}
+		}
+	}()
 
 	fmt.Println("Application started")
 	port := "7015"

@@ -5,27 +5,17 @@ import (
 	"admire-avatar/middlewares"
 	"admire-avatar/modules"
 	"admire-avatar/utils"
-	"bytes"
-	"encoding/json"
 	"fmt"
-	"github.com/google/uuid"
 	"github.com/gorilla/mux"
-	"io"
 	"io/ioutil"
 	"net/http"
 	"os"
 	"strings"
-	"time"
 )
-
-type GeneratedImage struct {
-	Phrase string   `json:"phrase"`
-	Tags   []string `json:"tags"`
-}
 
 func GetImages(w http.ResponseWriter, r *middlewares.AuthorizedRequest) {
 	var imageModule modules.ImageModule
-	images := imageModule.Get(r.User.ID)
+	images := imageModule.Get(r.User.ID, "avatar")
 
 	utils.WriteJsonResponse(w, images)
 }
@@ -40,10 +30,10 @@ func CreateAvatar(w http.ResponseWriter, r *middlewares.AuthorizedRequest) {
 }
 
 func GenerateImage(w http.ResponseWriter, r *middlewares.AuthorizedRequest) {
-	var data GeneratedImage
+	var data utils.GeneratedImage
 	utils.ParseRequestBody(w, r.Request, data)
 
-	filename, err := downloadFile(data)
+	filename, err := utils.DownloadFile(data)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -65,7 +55,7 @@ func SaveImage(w http.ResponseWriter, r *middlewares.AuthorizedRequest) {
 		return
 	}
 
-	err := os.Rename("images/temporary/"+data.Source, "image/avatars/"+data.Source)
+	err := os.Rename("files/temporary/"+data.Source, "files/images/"+data.Source)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusNotFound)
 		return
@@ -74,6 +64,7 @@ func SaveImage(w http.ResponseWriter, r *middlewares.AuthorizedRequest) {
 	image := entities.Image{
 		BaseImage: data,
 		UserId:    r.User.ID,
+		Type:      "avatar",
 	}
 	imageModule.Create(&image)
 
@@ -90,10 +81,9 @@ func RemoveImage(w http.ResponseWriter, r *middlewares.AuthorizedRequest) {
 		return
 	}
 
-	err = os.Remove("image/avatars/" + image.Source)
+	err = os.Remove("files/images/" + image.Source)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusNotFound)
-		return
+		fmt.Println(err)
 	}
 
 	imageModule.Delete(image.ID)
@@ -111,7 +101,7 @@ func GetImage(w http.ResponseWriter, r *middlewares.AuthorizedRequest) {
 		return
 	}
 
-	fileBytes, err := ioutil.ReadFile("image/avatars/" + image.Source)
+	fileBytes, err := ioutil.ReadFile("files/images/" + image.Source)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusNotFound)
 		return
@@ -139,7 +129,7 @@ func GetImageByEmail(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	fileBytes, err := ioutil.ReadFile("image/avatars/" + image.Source)
+	fileBytes, err := ioutil.ReadFile("files/images/" + image.Source)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusNotFound)
 		return
@@ -149,40 +139,4 @@ func GetImageByEmail(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
-}
-
-func downloadFile(data GeneratedImage) (string, error) {
-	body, err := json.Marshal(data)
-
-	var resp *http.Response
-	count := 0
-	for resp == nil {
-		resp, err = http.Post("http://192.168.43.7:8000/images/", "application/json", bytes.NewBuffer(body))
-		count += 1
-		if count >= 5 && err != nil {
-			return "", err
-		}
-	}
-
-	defer func() {
-		err = resp.Body.Close()
-		if err != nil {
-			fmt.Println(err)
-		}
-	}()
-
-	filename := uuid.New().String() + "_" + time.Now().String() + ".png"
-	out, err := os.Create("images/temporary/" + filename)
-	if err != nil {
-		return "", err
-	}
-	defer func() {
-		err = out.Close()
-		if err != nil {
-			fmt.Println(err)
-		}
-	}()
-
-	_, err = io.Copy(out, resp.Body)
-	return filename, err
 }

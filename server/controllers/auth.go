@@ -3,6 +3,7 @@ package controllers
 import (
 	"admire-avatar/config"
 	"admire-avatar/entities"
+	"admire-avatar/middlewares"
 	"admire-avatar/modules"
 	"admire-avatar/utils"
 	"context"
@@ -176,4 +177,8 @@ func writeTokens(w http.ResponseWriter, user *entities.User) {
 		Secure:  os.Getenv("ADMIN_HTTPS") != "false",
 		Expires: time.Now().Add(time.Hour * 24 * 30),
 	})
+}
+
+func GetUserByToken(w http.ResponseWriter, r *middlewares.AuthorizedRequest) {
+	utils.WriteJsonResponse(w, r.User)
 }

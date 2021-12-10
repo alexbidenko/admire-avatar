@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import {ref} from 'vue';
 import {NImage, NIcon, NButton} from 'naive-ui';
-import {SaveRound, ArrowForwardFilled} from '@vicons/material';
+import {Forward as ForwardRegular, SaveRegular} from '@vicons/fa';
 import {generateImage, saveImage} from '~/api/images';
 
 const image = ref('');
@@ -33,12 +33,12 @@ const likeImage = () => {
     <div class="buttonsContainer">
       <n-button @click="likeImage" class="buttonAction" strong secondary circle>
         <n-icon>
-          <SaveRound />
+          <save-regular />
         </n-icon>
       </n-button>
       <n-button @click="nextImage" class="buttonAction" strong secondary circle>
         <n-icon>
-          <ArrowForwardFilled />
+          <forward-regular />
         </n-icon>
       </n-button>
     </div>
