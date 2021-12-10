@@ -3,7 +3,7 @@ export type BaseImageType = {
 };
 
 export type ImageType = {
-  id: string;
+  id: number;
   userId: number;
   createdAt: string;
   updatedAt: string;

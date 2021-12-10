@@ -1,5 +1,6 @@
 import axios from 'axios';
 import Router from '../routes';
+import {refresh} from '~/api/users';
 
 const isObject = (o: any) => o === Object(o) && !Array.isArray(o) && typeof o !== 'function';
 
@@ -35,7 +36,7 @@ $axios.interceptors.response.use((response) => {
   return response;
 }, (error) => {
   if (error.response.status === 401 && !['/auth', '/sign-up'].includes(Router.currentRoute.value.path) && !error.config.url.endsWith('user/refresh')) {
-    return $axios.post('user/refresh').then(() => $axios.request(error.config)).catch(() => {
+    return refresh().then(() => $axios.request(error.config)).catch(() => {
       Router.push('/auth');
     });
   }

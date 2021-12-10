@@ -6,11 +6,15 @@ import {
   NButtonGroup,
   NImage,
   NH3,
+  NGrid,
+  NGridItem,
 } from 'naive-ui';
-import {getImages, deleteImage} from '~/api/images';
+import {getImages, deleteImage, downloadImage, createAvatar} from '~/api/images';
 import {ImageType} from '~/types/image';
+import {CloseSharp} from '@vicons/material';
 
 const images = ref<ImageType[]>([]);
+const isSelectedImage = ref(false);
 
 onMounted(() => {
   getImages().then(({data}) => {
@@ -21,19 +25,46 @@ onMounted(() => {
 const deleteCurrentImage = (id: number) => {
   deleteImage(id);
 };
+
+const downloadSelectedImage = (id: number) => {
+  downloadImage(id);
+};
+
+const selectedAvatar = (id: number) => {
+  isSelectedImage.value = true;
+  createAvatar(id);
+};
 </script>
 
 <template>
   <div class="container">
     <n-card>
       <n-h3 v-if="images.length === 0">Добавьте первое изображение</n-h3>
-      <n-image
+      <n-grid cols="2 375:3 600:4 700:5 1200:6">
+        <n-grid-item
           v-for="image in images"
-          @click="deleteCurrentImage(image.id)"
           :key="image.id"
-          width="100"
-          src="https://07akioni.oss-cn-beijing.aliyuncs.com/07akioni.jpeg"
-      />
+        >
+          <n-image
+              @click="selectedAvatar(image.id)"
+              :class="{'selected': isSelectedImage}"
+              preview-disabled
+              src="https://07akioni.oss-cn-beijing.aliyuncs.com/07akioni.jpeg"
+          />
+          <CloseSharp @click="deleteCurrentImage(image.id)" class="close"/>
+          <n-button type="success" @click="downloadSelectedImage(image.id)">Скачать</n-button>
+        </n-grid-item>
+        <n-grid-item>
+          <n-image
+              @click="selectedAvatar(image.id)"
+              :class="{'selected': isSelectedImage}"
+              preview-disabled
+              src="https://07akioni.oss-cn-beijing.aliyuncs.com/07akioni.jpeg"
+          />
+          <CloseSharp @click="deleteCurrentImage(image.id)" class="close"/>
+          <n-button type="success" @click="downloadSelectedImage(image.id)">Скачать</n-button>
+        </n-grid-item>
+      </n-grid>
     </n-card>
     <n-button-group class="button">
       <router-link to="/generate">
@@ -48,13 +79,31 @@ const deleteCurrentImage = (id: number) => {
   padding-top: 24px;
 }
 
-.imageContainer {
+.n-grid > div {
   position: relative;
+  display: flex;
+  flex-direction: column;
+
+  .n-button {
+    margin-top: 10px;
+  }
 }
 
-.close__icon {
+.close {
   position: absolute;
-  right: 0;
   top: 0;
+  right: 0;
+  width: 20%;
+  cursor: pointer;
+}
+
+.selected {
+  border: 1px solid red;
+  border-radius: 5px;
+}
+
+.n-image > img {
+  width: 100%;
+  cursor: pointer;
 }
 </style>

@@ -4,7 +4,7 @@ import {useRouter} from 'vue-router';
 import {useMainStore} from '~/store';
 import {logout, getUser} from '~/api/users';
 import {
-  NLayoutHeader, NButton, NSpace, NLayout, NH2,
+  NLayoutHeader, NButton, NSpace, NLayout, NH2, NButtonGroup,
 } from 'naive-ui';
 import {useRoute} from 'vue-router';
 
@@ -30,9 +30,11 @@ onMounted(() => {
     <n-layout-header position="absolute" bordered>
       <n-space justify="space-between">
         <n-h2>{{store.state.user.name}}</n-h2>
-        <router-link to="/">
-          <n-button v-if="route.path === '/generate'" type="info">Вернуться</n-button>
-        </router-link>
+        <n-button-group>
+          <router-link to="/">
+            <n-button v-if="route.path === '/generate'" type="info">Вернуться</n-button>
+          </router-link>
+        </n-button-group>
         <n-button type="warning" @click="logoutUser">Выйти</n-button>
       </n-space>
     </n-layout-header>
