@@ -17,12 +17,29 @@ import {
 </template>
 
 <style lang="scss">
+html {
+  --header-height: 64px;
+}
+
 body {
   overflow: hidden;
 }
 
 a {
   text-decoration: none;
+}
+
+.container {
+  max-width: calc(100% - 32px);
+  margin: 0 auto;
+  padding: 5vw;
+  display: flex;
+  flex-direction: column;
+
+  @media (min-width: 640px) {
+    max-width: 80vw;
+    margin: 0 auto;
+  }
 }
 
 .n-layout {
