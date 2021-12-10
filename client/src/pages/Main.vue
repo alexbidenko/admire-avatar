@@ -1,11 +1,5 @@
-<script setup lang="ts">
-import {
-  NCard,
-} from 'naive-ui';
-</script>
+<script setup lang="ts"></script>
 
 <template>
-  <n-card title="Auth">
-    Main huy
-  </n-card>
+  <p>Main huy</p>
 </template>

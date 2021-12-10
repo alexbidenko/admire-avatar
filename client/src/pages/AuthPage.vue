@@ -10,10 +10,10 @@ import {
       <form @submit.prevent="submit">
         <n-space vertical>
           Email
-          <n-input placeholder="Введите email" name="email" v-model:value="email" />
+          <n-input placeholder="Введите email" name="email" />
           Пароль
-          <n-input placeholder="Введите пароль" type="password" name="password" v-model:value="password" show-password-on="click" />
-          <n-button type="primary" attr-type="submit" class="authPage__button">Войти</n-button>
+          <n-input placeholder="Введите пароль" type="password" name="password" />
+          <n-button type="info" attr-type="submit" class="authPage__button">Войти</n-button>
         </n-space>
       </form>
     </n-card>
