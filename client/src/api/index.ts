@@ -1,5 +1,5 @@
 import axios from 'axios';
-// import Router from '~/router';
+import Router from '../../routes';
 
 const isObject = (o: any) => o === Object(o) && !Array.isArray(o) && typeof o !== 'function';
 

@@ -23,15 +23,15 @@ func main() {
 
 	fmt.Println("Session created")
 
-	routes := initRoutes()
+	router := initRoutes()
 
-	http.Handle("/", routes)
+	http.Handle("/", router)
 	fmt.Println("Application started")
 	port := "7015"
 	if os.Getenv("MODE") == "production" {
 		port = "80"
 	}
-	log.Fatal(http.ListenAndServe("0.0.0.0:"+port, routes))
+	log.Fatal(http.ListenAndServe("0.0.0.0:"+port, router))
 }
 
 func migrate() {

@@ -22,6 +22,5 @@ export default createStore<MainStateTypes>({
       state.user = {} as UserType;
       state.isAuthorized = false;
     },
-
   },
 });

@@ -2,7 +2,7 @@ import {createWebHistory, createRouter} from 'vue-router';
 import AuthLayout from './src/layout/AuthLayout.vue';
 import AuthPage from './src/pages/AuthPage.vue';
 import RegistrationPage from './src/pages/RegistrationPage.vue';
-import GeneratePage from './src/pages/GeneratePage.vue';
+import Main from '~/pages/MainPage.vue';
 import ListImages from './src/pages/ListImages.vue';
 
 const routes = [
@@ -22,9 +22,9 @@ const routes = [
     component: AuthLayout,
     children: [
       {
-        path: '/generate',
-        name: 'generate',
-        component: GeneratePage,
+        path: '/',
+        name: 'main',
+        component: Main,
       },
       {
         path: '/listImages',
