@@ -23,9 +23,9 @@ func main() {
 
 	fmt.Println("Session created")
 
-	router := initRoutes()
+	routes := initRoutes()
+	http.Handle("/", routes)
 
-	http.Handle("/", router)
 	fmt.Println("Application started")
 	port := "7015"
 	if os.Getenv("MODE") == "production" {
