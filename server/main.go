@@ -10,6 +10,7 @@ import (
 )
 
 func main() {
+	fmt.Println("Version is " + config.Version)
 	if os.Getenv("MODE") != "" {
 		fmt.Println("Initializing with mode " + os.Getenv("MODE"))
 	} else {
@@ -23,19 +24,19 @@ func main() {
 
 	fmt.Println("Session created")
 
-	router := initRoutes()
+	routes := initRoutes()
+	http.Handle("/", routes)
 
-	http.Handle("/", router)
 	fmt.Println("Application started")
 	port := "7015"
 	if os.Getenv("MODE") == "production" {
 		port = "80"
 	}
-	log.Fatal(http.ListenAndServe("0.0.0.0:"+port, router))
+	log.Fatal(http.ListenAndServe("0.0.0.0:"+port, routes))
 }
 
 func migrate() {
-	err := config.DB.AutoMigrate(&entities.User{})
+	err := config.DB.AutoMigrate(&entities.User{}, &entities.Image{})
 	if err != nil {
 		panic(err)
 	}
