@@ -18,9 +18,7 @@ func initRoutes() http.Handler {
 	s.HandleFunc("/user/sign-in", controllers.SignIn).Methods("POST")
 	s.HandleFunc("/user/logout", controllers.Logout).Methods("POST")
 	s.HandleFunc("/user/refresh", controllers.Refresh).Methods("POST")
-	s.HandleFunc("/user/password", middlewares.Auth(controllers.ChangePassword)).Methods("POST")
 	s.HandleFunc("/user", middlewares.Auth(controllers.GetUserByToken)).Methods("GET")
-	s.HandleFunc("/user/change", middlewares.Auth(controllers.ChangeUser)).Methods("POST")
 
 	s.HandleFunc("/images", middlewares.Auth(controllers.GetImages)).Methods("GET")
 	s.HandleFunc("/images", middlewares.Auth(controllers.SaveImage)).Methods("POST")
@@ -29,10 +27,13 @@ func initRoutes() http.Handler {
 	s.HandleFunc("/images/{id}", middlewares.Auth(controllers.CreateAvatar)).Methods("PUT")
 	s.HandleFunc("/images/{id}", middlewares.Auth(controllers.GetImage)).Methods("GET")
 
+	s.HandleFunc("/prints", middlewares.Auth(controllers.GetPrints)).Methods("GET")
+	s.HandleFunc("/prints", middlewares.Auth(controllers.GeneratePrints)).Methods("POST")
+
 	s.HandleFunc("/admire-avatar/{emailHash}", controllers.GetImageByEmail).Methods("GET")
 
 	s.PathPrefix("/files/temporary/").Handler(http.StripPrefix("/api/files/temporary/", http.FileServer(http.Dir("files/temporary"))))
-	s.PathPrefix("/files/avatars/").Handler(http.StripPrefix("/api/files/avatars/", http.FileServer(http.Dir("files/avatars"))))
+	s.PathPrefix("/files/images/").Handler(http.StripPrefix("/api/files/images/", http.FileServer(http.Dir("files/images"))))
 
 	if os.Getenv("MODE") == "production" {
 		r.PathPrefix("/").HandlerFunc(func(w http.ResponseWriter, r *http.Request) {

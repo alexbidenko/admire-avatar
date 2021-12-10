@@ -4,6 +4,7 @@ import AuthPage from './pages/AuthPage.vue';
 import RegistrationPage from './pages/RegistrationPage.vue';
 import Main from '~/pages/MainPage.vue';
 import GenerateImagePage from '~/pages/GenerateImagePage.vue';
+import PrintsPage from '~/pages/PrintsPage.vue';
 
 const routes = [
   {
@@ -30,6 +31,11 @@ const routes = [
         path: '/generateImages',
         name: 'generateImages',
         component: GenerateImagePage,
+      },
+      {
+        path: '/prints',
+        name: 'Prints',
+        component: PrintsPage,
       },
     ],
   },

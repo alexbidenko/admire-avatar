@@ -11,6 +11,7 @@ type BaseImage struct {
 type Image struct {
 	config.Model
 	BaseImage
-	UserId uint `json:"user_id"`
-	Main   bool `json:"main"`
+	UserId uint   `json:"user_id"`
+	Type   string `json:"type"`
+	Main   bool   `json:"main"`
 }

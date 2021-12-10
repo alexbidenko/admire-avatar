@@ -46,7 +46,6 @@ func DownloadFile(data GeneratedImage) (string, error) {
 	for resp == nil {
 		resp, err = http.Post("http://192.168.43.7:8000/images/", "application/json", bytes.NewBuffer(body))
 		if resp.StatusCode == 404 {
-			fmt.Println("Image not found")
 			return "", err
 		}
 

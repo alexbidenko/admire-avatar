@@ -8,9 +8,9 @@ import (
 type ImageModule struct {
 }
 
-func (i *ImageModule) Get(userID uint) []entities.Image {
+func (i *ImageModule) Get(userID uint, imageType string) []entities.Image {
 	images := make([]entities.Image, 0)
-	config.DB.Model(&entities.Image{}).Where("user_id = ?", userID).Find(&images)
+	config.DB.Model(&entities.Image{}).Where("user_id = ?", userID).Where("type = ?", imageType).Find(&images)
 	return images
 }
 

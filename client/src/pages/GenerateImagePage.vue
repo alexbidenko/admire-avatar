@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import {NImage, NIcon, NButton} from 'naive-ui';
-import {SaveRound, ArrowForwardFilled} from '@vicons/material';
+import {Forward as ForwardAlt, SaveRegular} from '@vicons/fa';
 </script>
 
 <template>
@@ -14,12 +14,12 @@ import {SaveRound, ArrowForwardFilled} from '@vicons/material';
     <div class="buttonsContainer">
       <n-button class="buttonAction" strong secondary circle>
         <n-icon>
-          <SaveRound />
+          <save-regular />
         </n-icon>
       </n-button>
       <n-button class="buttonAction" strong secondary circle>
         <n-icon>
-          <ArrowForwardFilled />
+          <forward-alt />
         </n-icon>
       </n-button>
     </div>
