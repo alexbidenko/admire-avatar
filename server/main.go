@@ -10,6 +10,7 @@ import (
 )
 
 func main() {
+	fmt.Println("Version is " + config.Version)
 	if os.Getenv("MODE") != "" {
 		fmt.Println("Initializing with mode " + os.Getenv("MODE"))
 	} else {
@@ -31,7 +32,6 @@ func main() {
 	if os.Getenv("MODE") == "production" {
 		port = "80"
 	}
-	fmt.Println("Version is " + config.Version)
 	log.Fatal(http.ListenAndServe("0.0.0.0:"+port, routes))
 }
 
