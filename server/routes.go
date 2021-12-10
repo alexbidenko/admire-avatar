@@ -5,6 +5,9 @@ import (
 	"admire-avatar/middlewares"
 	"github.com/gorilla/mux"
 	"net/http"
+	"os"
+	"path/filepath"
+	"strings"
 )
 
 func initRoutes() http.Handler {
@@ -30,6 +33,26 @@ func initRoutes() http.Handler {
 
 	s.PathPrefix("/files/temporary/").Handler(http.StripPrefix("/api/files/temporary/", http.FileServer(http.Dir("files/temporary"))))
 	s.PathPrefix("/files/avatars/").Handler(http.StripPrefix("/api/files/avatars/", http.FileServer(http.Dir("files/avatars"))))
+
+	if os.Getenv("MODE") == "production" {
+		r.PathPrefix("/").HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			path := filepath.Join("dist", r.URL.Path)
+
+			_, err := os.Stat(path)
+			if os.IsNotExist(err) {
+				http.ServeFile(w, r, filepath.Join("dist", "index.html"))
+				return
+			} else if err != nil {
+				http.Error(w, err.Error(), http.StatusInternalServerError)
+				return
+			}
+
+			if strings.HasSuffix(r.URL.Path, ".js") {
+				w.Header().Set("Content-Type", "application/javascript")
+			}
+			http.FileServer(http.Dir("dist")).ServeHTTP(w, r)
+		})
+	}
 
 	return r
 }

@@ -31,6 +31,7 @@ func main() {
 	if os.Getenv("MODE") == "production" {
 		port = "80"
 	}
+	fmt.Println("Version is " + config.Version)
 	log.Fatal(http.ListenAndServe("0.0.0.0:"+port, routes))
 }
 

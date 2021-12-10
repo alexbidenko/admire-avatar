@@ -14,7 +14,7 @@ func getDatabaseHost() string {
 	return "localhost"
 }
 
-var connStr = "host=" + getDatabaseHost() + " user=postgres password=postgres dbname=postgres sslmode=disable"
+var connStr = "host=" + getDatabaseHost() + " user=postgres password=" + PostgresPassword + " dbname=postgres sslmode=disable"
 var DB, DBError = gorm.Open(postgres.New(postgres.Config{
 	DSN: connStr,
 }), &gorm.Config{})

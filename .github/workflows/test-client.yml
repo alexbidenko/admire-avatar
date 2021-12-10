@@ -1,0 +1,40 @@
+name: Test client
+
+on:
+  push:
+    branches:
+      - '*'
+      - '*/*'
+      - '**'
+      - '!main'
+
+jobs:
+  test:
+    runs-on: ${{ matrix.os }}
+    env:
+      directory: client
+
+    strategy:
+      matrix:
+        os: [ubuntu-latest]
+
+    steps:
+      - name: Check out Git repository
+        uses: actions/checkout@v2
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v1
+        with:
+          node-version: 16
+
+      - name: Install Node.js dependencies
+        run: yarn install
+        working-directory: ${{ env.directory }}
+
+      - name: Run linters
+        run: yarn lint:es
+        working-directory: ${{ env.directory }}
+
+      - name: Run type check
+        run: yarn type-check
+        working-directory: ${{ env.directory }}
