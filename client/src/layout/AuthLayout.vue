@@ -6,6 +6,6 @@ import {
 
 <template>
   <n-card title="Auth">
-    Main
+    Main LAYOUT PASS
   </n-card>
 </template>

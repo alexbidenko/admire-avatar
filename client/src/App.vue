@@ -13,4 +13,16 @@ import Main from './pages/Main.vue';
   </n-config-provider>
 </template>
 
-<style></style>
+<style lang="scss">
+body {
+  overflow: hidden;
+}
+
+a {
+  text-decoration: none;
+}
+
+.n-layout {
+  height: 100vh;
+}
+</style>
