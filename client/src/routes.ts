@@ -1,9 +1,9 @@
 import {createWebHistory, createRouter} from 'vue-router';
-import AuthLayout from './src/layout/AuthLayout.vue';
-import AuthPage from './src/pages/AuthPage.vue';
-import RegistrationPage from './src/pages/RegistrationPage.vue';
+import AuthLayout from './layout/AuthLayout.vue';
+import AuthPage from './pages/AuthPage.vue';
+import RegistrationPage from './pages/RegistrationPage.vue';
 import Main from '~/pages/MainPage.vue';
-import ListImages from './src/pages/ListImages.vue';
+import GenerateImagePage from '~/pages/GenerateImagePage.vue';
 
 const routes = [
   {
@@ -27,9 +27,9 @@ const routes = [
         component: Main,
       },
       {
-        path: '/listImages',
-        name: 'listImages',
-        component: ListImages,
+        path: '/generateImages',
+        name: 'generateImages',
+        component: GenerateImagePage,
       },
     ],
   },

@@ -1,31 +1,51 @@
 <script setup lang="ts">
+import {onMounted} from 'vue';
 import {useRouter} from 'vue-router';
-import {logout} from '~/api/users';
+import {useMainStore} from '~/store';
+import {logout, getUser} from '~/api/users';
 import {
-  NLayoutHeader, NButton, NSpace, NLayout,
+  NLayoutHeader, NButton, NSpace, NLayout, NH2,
 } from 'naive-ui';
+import MainPage from '~/pages/MainPage.vue';
 
 const router = useRouter();
+const store = useMainStore();
 
 const logoutUser = () => {
   logout().then(() => {
     router.push('/auth');
   });
 };
+
+onMounted(() => {
+  getUser().then(({data}) => {
+    store.commit('setUser', data);
+  });
+});
 </script>
 
 <template>
   <n-layout class="authorizedLayout">
     <n-layout-header position="absolute" bordered>
-      <n-space justify="space-between" align="center">
+      <n-space justify="space-between">
+        <n-h2>{{store.state.user.name}}</n-h2>
         <n-button type="warning" @click="logoutUser">Выйти</n-button>
       </n-space>
     </n-layout-header>
+    <router-view />
   </n-layout>
 </template>
 
 <style lang="scss">
 .authorizedLayout {
-  padding-top: 64px;
+  padding-top: var(--header-height);
+}
+
+.n-layout-header {
+  grid-template-rows: calc(var(--header-height) - 1px);
+  display: grid;
+  padding: 0 32px;
+  align-items: center;
+  z-index: 10;
 }
 </style>

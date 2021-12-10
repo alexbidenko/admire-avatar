@@ -14,6 +14,6 @@ export const refresh = () => $axios.post<boolean>('user/refresh');
 
 export const changePassword = () => $axios.post<boolean>('user/password');
 
-export const getUser = () => $axios.post<UserType>('user');
+export const getUser = () => $axios.get<UserType>('user');
 
 export const changeUser = (user: Partial<UserType>) => $axios.post<UserType>('user/password', user);

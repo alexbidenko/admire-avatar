@@ -1,12 +1,15 @@
+import {InjectionKey} from 'vue';
 import {createStore, useStore, Store} from 'vuex';
-import {UserType} from '../types/user';
+import {UserType} from '~/types/user';
 
-type MainStateTypes = {
+type MainState = {
     user: UserType,
     isAuthorized: boolean,
 }
 
-export default createStore<MainStateTypes>({
+export const key: InjectionKey<Store<MainState>> = Symbol();
+
+export default createStore<MainState>({
   state: () => {
     return {
       user: {} as UserType,
@@ -24,3 +27,5 @@ export default createStore<MainStateTypes>({
     },
   },
 });
+
+export const useMainStore = () => useStore(key);
