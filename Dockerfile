@@ -34,6 +34,4 @@ COPY --from=build-server /go/src/application/main .
 
 RUN chmod +x ./entrypoint.sh
 
-EXPOSE 7015
-
 ENTRYPOINT  ["./entrypoint.sh"]

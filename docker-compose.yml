@@ -6,6 +6,8 @@ services:
     image: alexbidenko1998/admire-avatar:latest
     container_name: admire-avatar
     pull_policy: always
+    expose:
+      - 80
     volumes:
       - "files:/app/files"
     environment:
