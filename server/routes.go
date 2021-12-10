@@ -19,5 +19,17 @@ func initRoutes() http.Handler {
 	s.HandleFunc("/user", middlewares.Auth(controllers.GetUserByToken)).Methods("GET")
 	s.HandleFunc("/user/change", middlewares.Auth(controllers.ChangeUser)).Methods("POST")
 
+	s.HandleFunc("/images", middlewares.Auth(controllers.GetImages)).Methods("GET")
+	s.HandleFunc("/images", middlewares.Auth(controllers.SaveImage)).Methods("POST")
+	s.HandleFunc("/images", middlewares.Auth(controllers.GenerateImage)).Methods("PUT")
+	s.HandleFunc("/images/{id}", middlewares.Auth(controllers.RemoveImage)).Methods("DELETE")
+	s.HandleFunc("/images/{id}", middlewares.Auth(controllers.CreateAvatar)).Methods("PUT")
+	s.HandleFunc("/images/{id}", middlewares.Auth(controllers.GetImage)).Methods("GET")
+
+	s.HandleFunc("/admire-avatar/{emailHash}", controllers.GetImageByEmail).Methods("GET")
+
+	s.PathPrefix("/files/temporary/").Handler(http.StripPrefix("/api/files/temporary/", http.FileServer(http.Dir("files/temporary"))))
+	s.PathPrefix("/files/avatars/").Handler(http.StripPrefix("/api/files/avatars/", http.FileServer(http.Dir("files/avatars"))))
+
 	return r
 }

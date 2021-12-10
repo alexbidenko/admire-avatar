@@ -16,7 +16,8 @@ type BaseUser struct {
 
 type User struct {
 	BaseUser
-	Password string `json:"password"`
+	Password  string `json:"password"`
+	EmailHash string `json:"-"`
 }
 
 func (u *User) GenerateAccessToken() (string, error) {
