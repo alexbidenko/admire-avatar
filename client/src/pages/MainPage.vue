@@ -11,7 +11,7 @@ import {
 } from 'naive-ui';
 import {getImages, deleteImage, downloadImage, createAvatar} from '~/api/images';
 import {ImageType} from '~/types/image';
-import {CloseSharp} from '@vicons/material';
+import {TrashAlt} from '@vicons/fa';
 
 const images = ref<ImageType[]>([]);
 const isSelectedImage = ref(false);
@@ -51,7 +51,7 @@ const selectedAvatar = (id: number) => {
               preview-disabled
               src="https://07akioni.oss-cn-beijing.aliyuncs.com/07akioni.jpeg"
           />
-          <CloseSharp @click="deleteCurrentImage(image.id)" class="close"/>
+          <trash-alt @click="deleteCurrentImage(image.id)" class="close"/>
           <n-button type="success" @click="downloadSelectedImage(image.id)">Скачать</n-button>
         </n-grid-item>
         <n-grid-item>
@@ -61,7 +61,7 @@ const selectedAvatar = (id: number) => {
               preview-disabled
               src="https://07akioni.oss-cn-beijing.aliyuncs.com/07akioni.jpeg"
           />
-          <CloseSharp @click="deleteCurrentImage(image.id)" class="close"/>
+          <trash-alt @click="deleteCurrentImage(image.id)" class="close"/>
           <n-button type="success" @click="downloadSelectedImage(image.id)">Скачать</n-button>
         </n-grid-item>
       </n-grid>
