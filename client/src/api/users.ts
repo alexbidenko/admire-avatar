@@ -1,12 +1,12 @@
 import $axios from './index';
-import {UserType} from '../src/types/user';
+import {CreateUserType, UserType} from '~/types/user';
 
 export const signIn = (email: string, password: string) => $axios.post<UserType>('user/sign-in', {
   email,
   password,
 });
 
-export const signUp = (user: UserType) => $axios.post<UserType>('user/sign-up', user);
+export const signUp = (user: CreateUserType) => $axios.post<UserType>('user/sign-up', user);
 
 export const logout = () => $axios.post<boolean>('user/logout');
 

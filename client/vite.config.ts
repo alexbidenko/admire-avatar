@@ -1,12 +1,15 @@
 import {defineConfig} from 'vite';
 import vue from '@vitejs/plugin-vue';
+import path = require('path')
 
-// https://vitejs.dev/config/
 export default defineConfig({
   plugins: [vue()],
   server: {
     proxy: {
-      '/api': 'http://172.29.64.1:7015',
+      '/api': 'http://192.168.43.182:7015',
     },
+  },
+  alias: {
+    '~': path.resolve(__dirname, './src'),
   },
 });
