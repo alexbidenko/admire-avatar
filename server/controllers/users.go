@@ -2,16 +2,17 @@ package controllers
 
 import (
 	"admire-avatar/entities"
+	"admire-avatar/middlewares"
 	"admire-avatar/modules"
 	"admire-avatar/utils"
 	"golang.org/x/crypto/bcrypt"
 	"net/http"
 )
 
-func ChangePassword(w http.ResponseWriter, r *http.Request) {
+func ChangePassword(w http.ResponseWriter, r *middlewares.AuthorizedRequest) {
 	var userModule modules.UserModule
 	var user entities.User
-	utils.ParseRequestBody(w, r, &user)
+	utils.ParseRequestBody(w, r.Request, &user)
 
 	bytes, err := bcrypt.GenerateFromPassword([]byte(user.Password), 14)
 	if err != nil {
@@ -19,7 +20,7 @@ func ChangePassword(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	data, err := userModule.GetByEmail(r.Header.Get("Email"))
+	data, err := userModule.Find(r.User.ID)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusNotFound)
 		return
@@ -30,23 +31,16 @@ func ChangePassword(w http.ResponseWriter, r *http.Request) {
 	utils.WriteJsonResponse(w, nil)
 }
 
-func GetUserByToken(w http.ResponseWriter, r *http.Request) {
-	var userModule modules.UserModule
-	user, err := userModule.GetByEmail(r.Header.Get("Email"))
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusUnauthorized)
-		return
-	}
-
-	utils.WriteJsonResponse(w, user.BaseUser)
+func GetUserByToken(w http.ResponseWriter, r *middlewares.AuthorizedRequest) {
+	utils.WriteJsonResponse(w, r.User)
 }
 
-func ChangeUser(w http.ResponseWriter, r *http.Request) {
+func ChangeUser(w http.ResponseWriter, r *middlewares.AuthorizedRequest) {
 	var userModule modules.UserModule
 	var changedUser entities.User
-	utils.ParseRequestBody(w, r, &changedUser)
+	utils.ParseRequestBody(w, r.Request, &changedUser)
 
-	user, err := userModule.Find(r.Header.Get("Id"))
+	user, err := userModule.Find(r.User.ID)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusNotFound)
 		return

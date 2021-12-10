@@ -2,12 +2,19 @@ package middlewares
 
 import (
 	"admire-avatar/config"
+	"admire-avatar/entities"
 	"admire-avatar/utils"
 	"net/http"
-	"strconv"
 )
 
-func Auth(handler http.HandlerFunc) http.HandlerFunc {
+type AuthorizedRequest struct {
+	*http.Request
+	User entities.BaseUser
+}
+
+type AuthorizedHandlerFunc func(w http.ResponseWriter, r *AuthorizedRequest)
+
+func Auth(handler AuthorizedHandlerFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		tokenCookie, err := r.Cookie("access_token")
 		if err != nil {
@@ -21,7 +28,10 @@ func Auth(handler http.HandlerFunc) http.HandlerFunc {
 			return
 		}
 
-		r.Header.Set("Id", strconv.Itoa(int(claims.ID)))
-		handler.ServeHTTP(w, r)
+		authorizedRequest := AuthorizedRequest{
+			Request: r,
+			User:    claims.BaseUser,
+		}
+		handler(w, &authorizedRequest)
 	}
 }
