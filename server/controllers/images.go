@@ -48,7 +48,7 @@ func GenerateImage(w http.ResponseWriter, r *middlewares.AuthorizedRequest) {
 func SaveImage(w http.ResponseWriter, r *middlewares.AuthorizedRequest) {
 	var imageModule modules.ImageModule
 	var data entities.BaseImage
-	utils.ParseRequestBody(w, r.Request, data)
+	utils.ParseRequestBody(w, r.Request, &data)
 
 	if strings.Contains(data.Source, "..") {
 		http.Error(w, "", http.StatusForbidden)

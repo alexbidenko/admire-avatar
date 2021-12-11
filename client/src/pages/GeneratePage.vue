@@ -20,7 +20,6 @@ const nextImage = () => {
   }).then(({data}) => {
     image.value = data.source;
   });
-  search.value = '';
 };
 
 const likeImage = () => {
