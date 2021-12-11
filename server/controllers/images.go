@@ -183,3 +183,33 @@ func GetImageByEmail(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
 }
+
+func GetTags(w http.ResponseWriter, _ *middlewares.AuthorizedRequest) {
+	tags := []map[string]string{
+		{
+			"value": "abstractions",
+			"label": "Абстракции",
+		},
+		{
+			"value": "ar_deco",
+			"label": "Арт-Деко",
+		},
+		{
+			"value": "bosch",
+			"label": "Иероним Босх",
+		},
+		{
+			"value": "medieval",
+			"label": "Средневековье",
+		},
+		{
+			"value": "pop_art",
+			"label": "Поп-Арт",
+		},
+		{
+			"value": "van_goh",
+			"label": "Ван Гог",
+		},
+	}
+	utils.WriteJsonResponse(w, tags)
+}

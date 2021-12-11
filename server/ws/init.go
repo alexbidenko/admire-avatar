@@ -36,7 +36,6 @@ func Upgrade(w http.ResponseWriter, r *middlewares.AuthorizedRequest) (*websocke
 }
 
 func ServeWs(pool *Pool, w http.ResponseWriter, r *middlewares.AuthorizedRequest) {
-	fmt.Println("WebSocket Endpoint Hit")
 	conn, err := Upgrade(w, r)
 	if err != nil {
 		fmt.Fprintf(w, "%+v\n", err)

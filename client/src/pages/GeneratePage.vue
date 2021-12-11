@@ -38,17 +38,14 @@ const likeImage = () => {
 </script>
 
 <template>
-  <div class="container">
-    <n-space justify="center">
-      <div class="squareImageCard">
-        <n-image
-            v-if="image"
-            class="generatePage__image"
-            :src="`/api/files/temporary/${image}`"
-        />
-      </div>
-    </n-space>
-    <n-space justify="center" align="center">
+  <div class="container generatePage">
+    <div class="squareImageCard">
+      <n-image
+          class="generatePage__image"
+          :src="`/api/files/temporary/${image}`"
+      />
+    </div>
+    <n-space justify="center" align="center" style="margin-top: 16px">
       <n-button @click="likeImage" strong secondary circle>
         <n-icon>
           <save-regular />
@@ -66,22 +63,17 @@ const likeImage = () => {
 
 <style lang="scss">
 .generatePage {
+  .squareImageCard {
+    padding-top: 0;
+    width: 80vw;
+    max-width: 640px;
+    height: 80vw;
+    max-height: 640px;
+    margin: 0 auto;
+  }
+
   &__image img {
-    width: 100%;
-    max-width: 100%;
     object-fit: cover;
-
-    @media (min-width: 500px) {
-      width: 400px;
-    }
-
-    @media (min-width: 900px) {
-      width: 450px;
-    }
-
-    @media (min-width: 1300px) {
-      width: 720px;
-    }
   }
 }
 </style>

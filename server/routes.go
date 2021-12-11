@@ -26,6 +26,7 @@ func initRoutes() http.Handler {
 
 	s.HandleFunc("/images", middlewares.Auth(controllers.SaveImage)).Methods("POST")
 	s.HandleFunc("/images", middlewares.Auth(controllers.GenerateImage)).Methods("PUT")
+	s.HandleFunc("/images/tags", middlewares.Auth(controllers.GetTags)).Methods("GET")
 	s.HandleFunc("/images/avatar", middlewares.Auth(controllers.GetAvatar)).Methods("GET")
 	s.HandleFunc("/images/folder/{id}", middlewares.Auth(controllers.GetFolderImages)).Methods("GET")
 	s.HandleFunc("/images/{id}/folder/{folderId}", middlewares.Auth(controllers.ImageToFolder)).Methods("PUT")

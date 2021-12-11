@@ -9,7 +9,7 @@ import {
   NImage,
   NInput,
   NInputGroup,
-  NInputNumber,
+  NInputNumber, NSelect,
   useLoadingBar,
   useMessage,
 } from 'naive-ui';
@@ -17,12 +17,15 @@ import {clear, generatePrints, getPrints, saveAsAvatar} from '~/api/prints';
 import {ImageType} from '~/types/image';
 import {Download as DownloadRegular, SaveRegular, TrashAltRegular} from '@vicons/fa';
 import {deleteImage} from '~/api/images';
+import $axios from '~/api';
 
 const loader = useLoadingBar();
 const message = useMessage();
 
 const phrase = ref('');
 const count = ref(1);
+const tag = ref<string>();
+const tags = ref<{ value: string; label: string }[]>([]);
 const images = ref<ImageType[]>([]);
 
 const ws = new WebSocket(`${location.protocol === 'https' ? 'wss' : 'ws'}://${location.host}/api/prints/channel`);
@@ -32,16 +35,21 @@ ws.onmessage = (e: MessageEvent<string>) => {
 };
 
 loader.start();
-getPrints().then(({data}) => {
-  images.value = data;
-}).catch(loader.error).finally(loader.finish);
+Promise.all([
+  $axios.get('images/tags').then(({data}) => {
+    tags.value = data;
+  }),
+  getPrints().then(({data}) => {
+    images.value = data;
+  }),
+]).catch(loader.error).finally(loader.finish);
 
 const generate = () => {
   loader.start();
   generatePrints({
     count: count.value,
     phrase: phrase.value,
-    tags: [],
+    tags: tag.value ? [tag.value] : [],
   }).then(() => {
     message.info('Генерация принтов запущена');
   }).catch(() => {
@@ -73,11 +81,12 @@ const deleteAll = () => {
 </script>
 
 <template>
-  <div>
-    <n-h1>Генерация принтов</n-h1>
+  <div class="printsPage">
+    <n-h1>Генерация контента</n-h1>
     <n-card style="margin-bottom: 32px">
       <n-input-group>
         <n-input placeholder="Поисковая фраза" v-model:value="phrase" />
+        <n-select placeholder="Тег" v-model:value="tag" :options="tags" class="printsPage__select" />
         <n-input-number v-model:value="count" :min="1" />
       </n-input-group>
       <n-button-group style="margin-top: 16px">
@@ -124,6 +133,11 @@ const deleteAll = () => {
 .printsPage {
   &__image img {
     max-width: 100%;
+  }
+
+  &__select {
+    width: fit-content;
+    min-width: 135px;
   }
 }
 </style>

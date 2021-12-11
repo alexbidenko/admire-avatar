@@ -136,7 +136,7 @@ const handleSelect = (key: number, image: ImageType) => {
 
 <template>
   <div class="container">
-    <n-h1>Генерация аватарок</n-h1>
+    <n-h1>Мои изображения</n-h1>
     <n-card>
       <n-space justify="space-between">
         <router-link to="/generate">
@@ -153,8 +153,8 @@ const handleSelect = (key: number, image: ImageType) => {
     <n-grid style="margin-top: 32px" v-if="folders.length" cols="2 s:3 m:4 l:5 xl:6 2xl:8" responsive="screen" x-gap="16" y-gap="16">
       <n-grid-item v-for="folder in folders" :key="folder.id">
         <router-link :to="`/folder/${folder.id}`">
-          <n-card hovered>
-            <n-space justify="space-between" align="center" class="mainPage__folder">
+          <n-card hovered class="mainPage__folder">
+            <n-space justify="space-between" align="center">
               {{ folder.name }}
               <n-button size="small" type="error" @click.stop.prevent="deleteFolder(folder)" secondary>
                 <n-icon>
@@ -255,6 +255,11 @@ const handleSelect = (key: number, image: ImageType) => {
   .n-button {
     opacity: 0;
     transition: opacity 0.3s ease, color .3s var(--bezier), background-color .3s var(--bezier), opacity .3s var(--bezier), border-color .3s var(--bezier);
+  }
+
+  .n-card__content {
+    padding-top: 8px !important;
+    padding-bottom: 8px !important;
   }
 
   &:hover .n-button {
