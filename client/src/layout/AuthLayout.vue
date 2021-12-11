@@ -67,6 +67,7 @@ getAvatar().then(({data}) => {
             {{ store.state.user.name }}
             </span>
             <n-avatar
+              v-if="store.state.avatar"
               round
               :size="48"
               :src="`/api/files/images/${store.state.avatar?.source}`"
