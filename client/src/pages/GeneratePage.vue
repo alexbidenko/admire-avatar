@@ -32,19 +32,19 @@ const nextImage = () => {
 
 const likeImage = () => {
   saveImage({source: image.value}).then(() => {
-    alert('Картинка сохранена');
+    message.info('Картинка сохранена');
   });
 };
 </script>
 
 <template>
   <div class="container">
-    <div class="containerImages">
+    <n-space justify="center">
       <n-image
-          width="100"
+          class="generatePage__image"
           :src="`/api/files/temporary/${image}`"
       />
-    </div>
+    </n-space>
     <n-space justify="center" align="center">
       <n-button @click="likeImage" strong secondary circle>
         <n-icon>
@@ -62,13 +62,23 @@ const likeImage = () => {
 </template>
 
 <style lang="scss">
-.containerImages {
-  display: flex;
-  justify-content: center;
-}
+.generatePage {
+  &__image img {
+    width: 100%;
+    max-width: 100%;
+    object-fit: cover;
 
-.buttonsContainer {
-  display: flex;
-  justify-content: space-between;
+    @media (min-width: 500px) {
+      width: 400px;
+    }
+
+    @media (min-width: 900px) {
+      width: 450px;
+    }
+
+    @media (min-width: 1300px) {
+      width: 720px;
+    }
+  }
 }
 </style>
