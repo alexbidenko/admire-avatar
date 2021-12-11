@@ -3,7 +3,7 @@ import {useRouter} from 'vue-router';
 import {useMainStore} from '~/store';
 import {logout, getUser} from '~/api/users';
 import {
-  NLayoutHeader, NButton, NSpace, NLayout, NButtonGroup, NScrollbar, NDropdown, NAvatar,
+  NLayoutHeader, NButton, NSpace, NLayout, NButtonGroup, NScrollbar, NDropdown, NAvatar, NBackTop,
 } from 'naive-ui';
 import {useRoute} from 'vue-router';
 import {getAvatar} from '~/api/images';
@@ -78,6 +78,8 @@ getAvatar().then(({data}) => {
     </n-layout-header>
     <n-scrollbar class="authorizedLayout__scrollbar scrollContainer">
       <router-view />
+
+      <n-back-top :right="100" />
     </n-scrollbar>
   </n-layout>
 </template>

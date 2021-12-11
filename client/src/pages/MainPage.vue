@@ -5,13 +5,12 @@ import {
   NCard,
   NButtonGroup,
   NImage,
-  NH3,
   NGrid,
   NGridItem, NIcon, useLoadingBar, NH1,
 } from 'naive-ui';
 import {getImages, deleteImage, createAvatar} from '~/api/images';
 import {ImageType} from '~/types/image';
-import {Download as DownloadRegular, SaveRegular, TrashAlt} from '@vicons/fa';
+import {Download as DownloadRegular, UserCircle, TrashAlt} from '@vicons/fa';
 import {useMainStore} from '~/store';
 
 const COUNT = 40;
@@ -98,7 +97,7 @@ const selectAvatar = (image: ImageType) => {
             </a>
             <n-button type="success" @click="selectAvatar(image)">
               <n-icon>
-                <save-regular />
+                <user-circle />
               </n-icon>
             </n-button>
             <n-button type="error" @click="deleteCurrentImage(image.id)">
