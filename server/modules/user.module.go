@@ -14,6 +14,12 @@ func (userModule *UserModule) All() []entities.BaseUser {
 	return users
 }
 
+func (userModule *UserModule) Search(email string, exclude uint) []entities.BaseUser {
+	var users []entities.BaseUser
+	config.DB.Model(&entities.User{}).Where("email like ?", "%"+email+"%").Where("id <> ?", exclude).Offset(0).Limit(20).Order("created_at asc").Find(&users)
+	return users
+}
+
 func (userModule *UserModule) Create(user *entities.User) {
 	config.DB.Model(&entities.User{}).Create(&user)
 }

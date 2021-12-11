@@ -6,12 +6,15 @@ import (
 	"admire-avatar/modules"
 	"admire-avatar/utils"
 	"fmt"
+	"github.com/google/uuid"
 	"github.com/gorilla/mux"
+	"io"
 	"io/ioutil"
 	"net/http"
 	"os"
 	"strconv"
 	"strings"
+	"time"
 )
 
 func GetFolderImages(w http.ResponseWriter, r *middlewares.AuthorizedRequest) {
@@ -184,32 +187,87 @@ func GetImageByEmail(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func GetTags(w http.ResponseWriter, _ *middlewares.AuthorizedRequest) {
-	tags := []map[string]string{
-		{
-			"value": "abstractions",
-			"label": "Абстракции",
-		},
-		{
-			"value": "ar_deco",
-			"label": "Арт-Деко",
-		},
-		{
-			"value": "bosch",
-			"label": "Иероним Босх",
-		},
-		{
-			"value": "medieval",
-			"label": "Средневековье",
-		},
-		{
-			"value": "pop_art",
-			"label": "Поп-Арт",
-		},
-		{
-			"value": "van_goh",
-			"label": "Ван Гог",
-		},
+type ShareRequestBody struct {
+	UserId  uint `json:"user_id"`
+	ImageId uint `json:"image_id"`
+}
+
+func ShareImage(w http.ResponseWriter, r *middlewares.AuthorizedRequest) {
+	var data ShareRequestBody
+	utils.ParseRequestBody(w, r.Request, &data)
+
+	var folderModule modules.FolderModule
+	var imageModule modules.ImageModule
+	image, err := imageModule.Find(r.User.ID, strconv.Itoa(int(data.ImageId)))
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusNotFound)
+		return
 	}
-	utils.WriteJsonResponse(w, tags)
+	folder, err := folderModule.GetByName(data.UserId, "Поделились с вами")
+	if err != nil {
+		folder = entities.Folder{
+			UserID: data.UserId,
+			Name:   "Поделились с вами",
+		}
+		folderModule.Create(&folder)
+	}
+
+	filename := uuid.New().String() + "_" + strconv.FormatInt(time.Now().UnixNano(), 10) + ".png"
+	err = copy("files/images/"+image.Source, filename)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusNotFound)
+		return
+	}
+
+	sharedImage := entities.Image{
+		UserID:   data.UserId,
+		FolderId: folder.ID,
+		Type:     "avatar",
+		Main:     false,
+	}
+	imageModule.Create(&sharedImage)
+
+	utils.WriteJsonResponse(w, true)
+}
+
+func GetTags(w http.ResponseWriter, _ *middlewares.AuthorizedRequest) {
+	resp, err := http.Get("http://192.168.43.7:8000/images/tags")
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+	}
+
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+	}
+
+	_, err = w.Write(body)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+	}
+}
+
+func copy(src, dst string) error {
+	sourceFileStat, err := os.Stat(src)
+	if err != nil {
+		return err
+	}
+
+	if !sourceFileStat.Mode().IsRegular() {
+		return fmt.Errorf("%s is not a regular file", src)
+	}
+
+	source, err := os.Open(src)
+	if err != nil {
+		return err
+	}
+	defer source.Close()
+
+	destination, err := os.Create(dst)
+	if err != nil {
+		return err
+	}
+	defer destination.Close()
+	_, err = io.Copy(destination, source)
+	return err
 }

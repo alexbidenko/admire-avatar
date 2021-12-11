@@ -125,6 +125,15 @@ func Refresh(w http.ResponseWriter, r *http.Request) {
 	utils.WriteJsonResponse(w, true)
 }
 
+func SearchUsers(w http.ResponseWriter, r *middlewares.AuthorizedRequest) {
+	email := r.URL.Query().Get("email")
+	var userModule modules.UserModule
+
+	users := userModule.Search(email, r.User.ID)
+
+	utils.WriteJsonResponse(w, users)
+}
+
 func Logout(w http.ResponseWriter, r *http.Request) {
 	var ctx = context.Background()
 	accessTokenCookie, err := r.Cookie("access_token")

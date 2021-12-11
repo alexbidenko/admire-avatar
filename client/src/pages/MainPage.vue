@@ -1,18 +1,40 @@
 <script setup lang="ts">
-import {computed, onMounted, onUnmounted, ref} from 'vue';
+import {computed, h, onMounted, onUnmounted, ref} from 'vue';
 import {
   NButton,
   NCard,
   NButtonGroup,
   NImage,
   NGrid,
-  NGridItem, NIcon, useLoadingBar, NH1, useMessage, NModal, NInput, NSpace, useDialog, NDropdown,
+  NGridItem,
+  NIcon,
+  useLoadingBar,
+  NH1,
+  useMessage,
+  NModal,
+  NInput,
+  NSpace,
+  useDialog,
+  NDropdown,
+  NSelect,
+  NAvatar,
+  NText,
 } from 'naive-ui';
 import {getImages, deleteImage, createAvatar} from '~/api/images';
 import {FolderType, ImageType} from '~/types/image';
-import {Download as DownloadRegular, UserCircle, TrashAlt, Share as ShareRegular, FolderPlus} from '@vicons/fa';
+import {
+  Download as DownloadRegular,
+  UserCircle,
+  TrashAlt,
+  Share as ShareRegular,
+  FolderPlus,
+  ShareAlt,
+} from '@vicons/fa';
 import {useMainStore} from '~/store';
 import $axios from '~/api';
+import {UserType} from '~/types/user';
+import {SelectBaseOption} from 'naive-ui/es/select/src/interface';
+import md5 from 'md5';
 
 const COUNT = 40;
 
@@ -24,9 +46,15 @@ const page = ref(0);
 const isRequest = ref(true);
 const isFinish = ref(false);
 
+const isRequestUser = ref(false);
+const isRequestShare = ref(false);
 const showModal = ref(false);
+const showShare = ref(false);
 const folders = ref<FolderType[]>([]);
 const images = ref<ImageType[]>([]);
+const users = ref<(UserType & {label: string; value: number})[]>([]);
+const selectedImage = ref<ImageType>();
+const selectedUser = ref<UserType>();
 const directoryName = ref('');
 
 loader.start();
@@ -65,9 +93,10 @@ onMounted(() => {
 });
 
 const deleteCurrentImage = (id: number) => {
+  loader.start();
   deleteImage(id).then(() => {
     images.value = images.value.filter((el) => el.id !== id);
-  });
+  }).catch(loader.error).finally(loader.finish);
 };
 
 const selectAvatar = (image: ImageType) => {
@@ -81,8 +110,10 @@ const selectAvatar = (image: ImageType) => {
 };
 
 const cancel = () => {
+  showShare.value = false;
   showModal.value = false;
   directoryName.value = '';
+  selectedUser.value = undefined;
 };
 
 const deleteFolder = (folder: FolderType) => {
@@ -132,6 +163,107 @@ const handleSelect = (key: number, image: ImageType) => {
     images.value = images.value.filter((el) => el.id !== image.id);
   }).catch(loader.error).finally(loader.finish);
 };
+
+const shareImage = (image: ImageType) => {
+  showShare.value = true;
+  selectedImage.value = image;
+};
+
+const shareImageRequest = () => {
+  if (!selectedUser.value || !selectedImage.value || isRequestShare.value) return;
+  isRequestShare.value = true;
+  loader.start();
+  $axios.post('/images/share', {
+    userId: selectedUser.value.id,
+    imageId: selectedImage.value.id,
+  }).then(() => {
+    selectedUser.value = undefined;
+    showShare.value = false;
+    message.success('Сообщение успешно отправлено');
+  }).catch(() => {
+    message.error('Во время отправки изображения произошла ошибка');
+    loader.error();
+  }).finally(() => {
+    loader.finish();
+    isRequestShare.value = false;
+  });
+};
+
+const handleSearch = (query: string) => {
+  isRequestUser.value = true;
+  $axios.get<UserType[]>('users', {
+    params: {
+      email: query,
+    },
+  }).then(({data}) => {
+    users.value = data.map((el) => ({
+      ...el,
+      label: el.name,
+      value: el.id,
+    }));
+  }).finally(() => {
+    isRequestUser.value = false;
+  });
+};
+
+handleSearch('');
+
+const renderSingleSelectTag = (data: { option: SelectBaseOption<UserType> }) => (h as any)(
+  'div',
+  {
+    style: {
+      display: 'flex',
+      alignItems: 'center',
+    },
+  },
+  [
+    h(NAvatar, {
+      src: `/api/admire-avatar/${md5(data.option.email)}`,
+      round: true,
+      size: 24,
+      style: {
+        marginRight: '12px',
+      },
+    }),
+    data.option.name,
+  ],
+);
+
+const renderLabel = (option: UserType) => (h as any)(
+  'div',
+  {
+    style: {
+      display: 'flex',
+      alignItems: 'center',
+    },
+  },
+  [
+    h(NAvatar, {
+      src: `/api/admire-avatar/${md5(option.email)}`,
+      round: true,
+      size: 'small',
+    }),
+    h(
+      'div',
+      {
+        style: {
+          marginLeft: '12px',
+          padding: '4px 0',
+        },
+      },
+      [
+        (h as any)('div', null, [option.name]),
+        h(
+          NText,
+          {depth: 3, tag: 'div'},
+          {
+            default: () => option.email,
+          },
+        ),
+      ],
+    ),
+  ],
+);
 </script>
 
 <template>
@@ -178,7 +310,7 @@ const handleSelect = (key: number, image: ImageType) => {
                 :src="`/api/files/images/${image.source}`"
             />
           </div>
-          <n-button-group style="padding-bottom: 10px; width: 100%; justify-content: center">
+          <n-button-group class="mainPage__actions">
             <a download="avatar.png" :href="`/api/files/images/${image.source}`">
               <n-button type="info">
                 <n-icon>
@@ -203,6 +335,11 @@ const handleSelect = (key: number, image: ImageType) => {
                 </n-icon>
               </n-button>
             </n-dropdown>
+            <n-button type="info" @click="shareImage(image)">
+              <n-icon>
+                <share-alt />
+              </n-icon>
+            </n-button>
           </n-button-group>
         </n-card>
       </n-grid-item>
@@ -218,6 +355,33 @@ const handleSelect = (key: number, image: ImageType) => {
             </n-button>
             <n-button type="success" @click="createFolder">
               Создать
+            </n-button>
+          </n-button-group>
+        </template>
+      </n-card>
+    </n-modal>
+
+    <n-modal v-model:show="showShare">
+      <n-card style="width: 600px;" title="Поделиться изображением" preset="card">
+        <n-select
+            :render-label="renderLabel"
+            :render-tag="renderSingleSelectTag"
+            filterable
+            placeholder="Введите Email пользователя"
+            :options="users"
+            :loading="isRequestUser"
+            clearable
+            remote
+            @search="handleSearch"
+            v-model:value="selectedUser"
+        />
+        <template #footer>
+          <n-button-group style="display: flex; justify-content: end">
+            <n-button type="warning" @click="cancel">
+              Отменить
+            </n-button>
+            <n-button type="success" @click="shareImageRequest" :loading="isRequestShare" :disabled="isRequestShare">
+              Поделиться
             </n-button>
           </n-button-group>
         </template>
@@ -251,19 +415,31 @@ const handleSelect = (key: number, image: ImageType) => {
   cursor: pointer;
 }
 
-.mainPage__folder {
-  .n-button {
-    opacity: 0;
-    transition: opacity 0.3s ease, color .3s var(--bezier), background-color .3s var(--bezier), opacity .3s var(--bezier), border-color .3s var(--bezier);
+.mainPage {
+  &__folder {
+    .n-button {
+      opacity: 0;
+      transition: opacity 0.3s ease, color .3s var(--bezier), background-color .3s var(--bezier), opacity .3s var(--bezier), border-color .3s var(--bezier);
+    }
+
+    .n-card__content {
+      padding-top: 8px !important;
+      padding-bottom: 8px !important;
+    }
+
+    &:hover .n-button {
+      opacity: 1;
+    }
   }
 
-  .n-card__content {
-    padding-top: 8px !important;
-    padding-bottom: 8px !important;
-  }
+  &__actions {
+    padding-bottom: 10px;
+    width: 100%;
+    justify-content: center;
 
-  &:hover .n-button {
-    opacity: 1;
+    .n-button {
+      width: 34px;
+    }
   }
 }
 </style>

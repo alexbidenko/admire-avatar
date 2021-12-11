@@ -14,6 +14,12 @@ func (f *FolderModule) Get(userID uint) []entities.Folder {
 	return folders
 }
 
+func (f *FolderModule) GetByName(userID uint, name string) (entities.Folder, error) {
+	var folder entities.Folder
+	err := config.DB.Model(&entities.Folder{}).Where("user_id = ?", userID).Where("name = ?", name).First(&folder).Error
+	return folder, err
+}
+
 func (f *FolderModule) Create(folder *entities.Folder) {
 	config.DB.Model(&entities.Folder{}).Create(folder)
 }
