@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import {ref, onMounted} from 'vue';
+import {ref} from 'vue';
 import {
   NButton,
   NCard,
@@ -9,12 +9,11 @@ import {
   NGrid,
   NGridItem,
 } from 'naive-ui';
-import {getImages, deleteImage, downloadImage, createAvatar} from '~/api/images';
+import {getImages, deleteImage, createAvatar} from '~/api/images';
 import {ImageType} from '~/types/image';
 import {TrashAlt} from '@vicons/fa';
 
 const images = ref<ImageType[]>([]);
-const isSelectedImage = ref(false);
 
 getImages().then(({data}) => {
   images.value = data;
@@ -24,13 +23,10 @@ const deleteCurrentImage = (id: number) => {
   deleteImage(id);
 };
 
-const downloadSelectedImage = (id: number) => {
-  downloadImage(id);
-};
-
-const selectedAvatar = (id: number) => {
-  isSelectedImage.value = true;
-  createAvatar(id);
+const selectedAvatar = (image: ImageType) => {
+  createAvatar(image.id).then(() => {
+    image.main = true;
+  });
 };
 </script>
 
@@ -44,13 +40,15 @@ const selectedAvatar = (id: number) => {
           :key="image.id"
         >
           <n-image
-              @click="selectedAvatar(image.id)"
-              :class="{'selected': isSelectedImage}"
+              @click="selectedAvatar(image)"
+              :class="{'selected': image.main}"
               preview-disabled
               :src="`/api/files/images/${image.source}`"
           />
           <trash-alt @click="deleteCurrentImage(image.id)" class="close"/>
-          <n-button type="success" @click="downloadSelectedImage(image.id)">Скачать</n-button>
+          <a download="avatar.png" :href="`/api/files/images/${image.source}`">
+            <n-button type="success">Скачать</n-button>
+          </a>
         </n-grid-item>
       </n-grid>
     </n-card>
@@ -86,7 +84,7 @@ const selectedAvatar = (id: number) => {
 }
 
 .selected {
-  border: 1px solid red;
+  border: 4px solid red;
   border-radius: 5px;
 }
 

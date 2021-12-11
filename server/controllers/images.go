@@ -31,7 +31,7 @@ func CreateAvatar(w http.ResponseWriter, r *middlewares.AuthorizedRequest) {
 
 func GenerateImage(w http.ResponseWriter, r *middlewares.AuthorizedRequest) {
 	var data utils.GeneratedImage
-	utils.ParseRequestBody(w, r.Request, data)
+	utils.ParseRequestBody(w, r.Request, &data)
 
 	filename, err := utils.DownloadFile(data)
 	if err != nil {

@@ -10,7 +10,7 @@ type ImageModule struct {
 
 func (i *ImageModule) Get(userID uint, imageType string) []entities.Image {
 	images := make([]entities.Image, 0)
-	config.DB.Model(&entities.Image{}).Where("user_id = ?", userID).Where("type = ?", imageType).Find(&images)
+	config.DB.Model(&entities.Image{}).Where("user_id = ?", userID).Where("type = ?", imageType).Order("created_at desc").Find(&images)
 	return images
 }
 
@@ -37,4 +37,8 @@ func (i *ImageModule) Delete(id uint) {
 func (i *ImageModule) CreateAvatar(userID uint, imageID string) {
 	config.DB.Model(&entities.Image{}).Where("user_id = ?", userID).Update("main", false)
 	config.DB.Model(&entities.Image{}).Where("user_id = ?", userID).Where("id = ?", imageID).Update("main", true)
+}
+
+func (i *ImageModule) PrintToAvatar(userID uint, imageID string) {
+	config.DB.Model(&entities.Image{}).Where("id = ?", imageID).Update("type", "avatar")
 }
