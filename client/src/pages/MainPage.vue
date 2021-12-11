@@ -16,10 +16,8 @@ import {TrashAlt} from '@vicons/fa';
 const images = ref<ImageType[]>([]);
 const isSelectedImage = ref(false);
 
-onMounted(() => {
-  getImages().then(({data}) => {
-    images.value = data;
-  });
+getImages().then(({data}) => {
+  images.value = data;
 });
 
 const deleteCurrentImage = (id: number) => {
@@ -49,17 +47,7 @@ const selectedAvatar = (id: number) => {
               @click="selectedAvatar(image.id)"
               :class="{'selected': isSelectedImage}"
               preview-disabled
-              src="https://07akioni.oss-cn-beijing.aliyuncs.com/07akioni.jpeg"
-          />
-          <trash-alt @click="deleteCurrentImage(image.id)" class="close"/>
-          <n-button type="success" @click="downloadSelectedImage(image.id)">Скачать</n-button>
-        </n-grid-item>
-        <n-grid-item>
-          <n-image
-              @click="selectedAvatar(image.id)"
-              :class="{'selected': isSelectedImage}"
-              preview-disabled
-              src="https://07akioni.oss-cn-beijing.aliyuncs.com/07akioni.jpeg"
+              :src="`/api/files/images/${image.source}`"
           />
           <trash-alt @click="deleteCurrentImage(image.id)" class="close"/>
           <n-button type="success" @click="downloadSelectedImage(image.id)">Скачать</n-button>
