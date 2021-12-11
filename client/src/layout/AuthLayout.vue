@@ -10,12 +10,12 @@ import {getAvatar} from '~/api/images';
 
 const LINKS = [
   {
-    label: 'Аватарки',
+    label: 'Библиотека',
     key: 'main',
     to: '/',
   },
   {
-    label: 'Принты',
+    label: 'Генератор',
     key: 'Prints',
     to: '/prints',
   },
