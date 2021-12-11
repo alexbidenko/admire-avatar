@@ -37,21 +37,19 @@ const likeImage = () => {
           :src="`/api/files/temporary/${image}`"
       />
     </div>
-    <div class="buttonsContainer">
-      <n-space justify="space-between" align="center">
-        <n-button @click="likeImage" class="buttonAction" strong secondary circle>
-          <n-icon>
-            <save-regular />
-          </n-icon>
-        </n-button>
-        <n-input @keydown.enter="nextImage" v-model:value="search" type="text" placeholder="Найти аватарку" />
-        <n-button @click="nextImage" class="buttonAction" strong secondary circle>
-          <n-icon>
-            <forward-regular />
-          </n-icon>
-        </n-button>
-      </n-space>
-    </div>
+    <n-space justify="center" align="center">
+      <n-button @click="likeImage" strong secondary circle>
+        <n-icon>
+          <save-regular />
+        </n-icon>
+      </n-button>
+      <n-input @keydown.enter="nextImage" v-model:value="search" type="text" placeholder="Найти аватарку" />
+      <n-button @click="nextImage" type="success" strong secondary circle>
+        <n-icon>
+          <forward-regular />
+        </n-icon>
+      </n-button>
+    </n-space>
   </div>
 </template>
 
@@ -64,11 +62,5 @@ const likeImage = () => {
 .buttonsContainer {
   display: flex;
   justify-content: space-between;
-}
-
-.buttonAction {
-  font-size: 70px;
-  width: 90px;
-  height: 90px;
 }
 </style>
