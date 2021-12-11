@@ -3,7 +3,7 @@ import {signIn} from '~/api/users';
 import {ref} from 'vue';
 import {useRouter} from 'vue-router';
 import {
-  NButton, NCard, NInput, NSpace, useLoadingBar,
+  NButton, NCard, NInput, NSpace, useLoadingBar, useMessage,
 } from 'naive-ui';
 
 const loader = useLoadingBar();
@@ -14,11 +14,16 @@ const password = ref('');
 
 if (document.cookie.includes('authorized=true')) router.push('/');
 
+const message = useMessage();
+
 const submit = () => {
   loader.start();
   signIn(email.value, password.value).then(() => {
     router.push('/');
-  }).catch(loader.error).finally(loader.finish);
+  }).catch(() => {
+    message.error('Введён неправильный логин или пароль');
+    loader.error;
+  }).finally(loader.finish);
 };
 </script>
 
