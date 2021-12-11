@@ -8,7 +8,6 @@ import (
 	"log"
 	"net/http"
 	"os"
-	"path/filepath"
 	"time"
 )
 
@@ -30,7 +29,7 @@ func main() {
 	routes := initRoutes()
 	http.Handle("/", routes)
 
-	go func() {
+	clear := func() {
 		files, err := ioutil.ReadDir("files/temporary")
 		if err != nil {
 			fmt.Println(err)
@@ -38,12 +37,18 @@ func main() {
 		}
 
 		for _, file := range files {
-			if file.Mode().IsRegular() && filepath.Ext(file.Name()) == "png" && time.Now().Sub(file.ModTime()) > 2*time.Hour {
-				err = os.Remove("files/images/" + file.Name())
+			if time.Now().Sub(file.ModTime()) > 2*time.Hour {
+				err = os.Remove("files/temporary/" + file.Name())
 				if err != nil {
 					fmt.Println(err)
 				}
 			}
+		}
+	}
+	clear()
+	go func() {
+		for range time.Tick(time.Hour) {
+			clear()
 		}
 	}()
 
@@ -56,7 +61,7 @@ func main() {
 }
 
 func migrate() {
-	err := config.DB.AutoMigrate(&entities.User{}, &entities.Image{})
+	err := config.DB.AutoMigrate(&entities.User{}, &entities.Image{}, &entities.Folder{})
 	if err != nil {
 		panic(err)
 	}

@@ -15,7 +15,7 @@ import {
 } from 'naive-ui';
 import {clear, generatePrints, getPrints, saveAsAvatar} from '~/api/prints';
 import {ImageType} from '~/types/image';
-import {SaveRegular, TrashAltRegular} from '@vicons/fa';
+import {Download as DownloadRegular, SaveRegular, TrashAltRegular} from '@vicons/fa';
 import {deleteImage} from '~/api/images';
 
 const loader = useLoadingBar();
@@ -79,9 +79,16 @@ const deleteAll = () => {
       <n-input placeholder="Поисковая фраза" v-model:value="phrase" />
       <n-input-number v-model:value="count" :min="1" />
     </n-input-group>
-    <n-button-group>
-      <n-button @click="generate" type="primary" style="margin-top: 16px">Сгенерировать</n-button>
-      <n-button @click="deleteAll" type="error" style="margin-top: 16px">Очистить</n-button>
+    <n-button-group style="margin-top: 16px">
+      <n-button @click="generate" type="primary">Сгенерировать</n-button>
+      <n-button @click="deleteAll" type="error">Очистить</n-button>
+      <a href="/api/prints/archive" download="archive.zip">
+        <n-button type="info">
+          <n-icon>
+            <download-regular />
+          </n-icon>
+        </n-button>
+      </a>
     </n-button-group>
   </n-card>
 

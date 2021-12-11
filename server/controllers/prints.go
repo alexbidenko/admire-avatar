@@ -6,8 +6,11 @@ import (
 	"admire-avatar/modules"
 	"admire-avatar/utils"
 	"admire-avatar/ws"
+	"archive/zip"
 	"fmt"
+	"github.com/google/uuid"
 	"github.com/gorilla/mux"
+	"io"
 	"net/http"
 	"os"
 	"strconv"
@@ -77,7 +80,11 @@ func PrintToAvatar(w http.ResponseWriter, r *middlewares.AuthorizedRequest) {
 	var imageModule modules.ImageModule
 	imageID := mux.Vars(r.Request)["id"]
 
-	imageModule.PrintToAvatar(r.User.ID, imageID)
+	err := imageModule.PrintToAvatar(r.User.ID, imageID)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusNotFound)
+		return
+	}
 
 	utils.WriteJsonResponse(w, true)
 }
@@ -96,4 +103,40 @@ func Clear(w http.ResponseWriter, r *middlewares.AuthorizedRequest) {
 	imageModule.Clear(r.User.ID, "print")
 
 	utils.WriteJsonResponse(w, true)
+}
+
+type DownloadArchiveBody struct {
+}
+
+func DownloadArchive(w http.ResponseWriter, r *middlewares.AuthorizedRequest) {
+	generateFileId := uuid.New().String()
+	archive, err := os.Create("files/temporary/" + generateFileId + ".zip")
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	defer archive.Close()
+	zipWriter := zip.NewWriter(archive)
+
+	var imagesModule modules.ImageModule
+	images := imagesModule.Get(r.User.ID, "print")
+	for _, image := range images {
+		f1, err := os.Open("files/images/" + image.Source)
+		if err == nil {
+			defer f1.Close()
+
+			w1, err := zipWriter.Create(image.Source)
+			if err != nil {
+				panic(err)
+			}
+			if _, err := io.Copy(w1, f1); err != nil {
+				http.Error(w, err.Error(), http.StatusInternalServerError)
+				return
+			}
+		}
+	}
+
+	zipWriter.Close()
+
+	http.ServeFile(w, r.Request, "files/temporary/"+generateFileId+".zip")
 }
