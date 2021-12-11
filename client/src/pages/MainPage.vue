@@ -40,9 +40,7 @@ const selectedAvatar = (image: ImageType) => {
           :key="image.id"
         >
           <n-image
-              @click="selectedAvatar(image)"
               :class="{'selected': image.main}"
-              preview-disabled
               :src="`/api/files/images/${image.source}`"
           />
           <trash-alt @click="deleteCurrentImage(image.id)" class="close"/>
