@@ -77,7 +77,11 @@ const likeImage = () => {
     }
 
     @media (min-width: 1300px) {
-      width: 720px;
+      width: 500px;
+    }
+
+    @media (min-width: 1600px) {
+      width: 750px;
     }
   }
 }
