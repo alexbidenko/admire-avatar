@@ -15,6 +15,7 @@ export type ImageType = {
   createdAt: string;
   updatedAt: string;
   type: ImageTypeEnum;
+  main: boolean;
 } & BaseImageType;
 
 export type ImageInputType = {
