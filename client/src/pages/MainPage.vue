@@ -5,13 +5,12 @@ import {
   NCard,
   NButtonGroup,
   NImage,
-  NH3,
   NGrid,
-  NGridItem, NIcon, useLoadingBar,
+  NGridItem, NIcon, useLoadingBar, NH1,
 } from 'naive-ui';
 import {getImages, deleteImage, createAvatar} from '~/api/images';
 import {ImageType} from '~/types/image';
-import {Download as DownloadRegular, SaveRegular, TrashAlt} from '@vicons/fa';
+import {Download as DownloadRegular, UserCircle, TrashAlt} from '@vicons/fa';
 import {useMainStore} from '~/store';
 
 const COUNT = 40;
@@ -71,23 +70,24 @@ const selectAvatar = (image: ImageType) => {
 
 <template>
   <div class="container">
-    <n-button-group class="button">
+    <n-h1>Генерация аватарок</n-h1>
+    <n-card style="margin-bottom: 32px">
       <router-link to="/generate">
-        <n-button type="warning">Добавить новое изображение</n-button>
+        <n-button type="warning">Сгенерировать</n-button>
       </router-link>
-    </n-button-group>
-    <n-card>
-      <n-h3 v-if="images.length === 0">Добавьте первое изображение</n-h3>
-      <n-grid cols="2 375:3 600:4 700:5 1200:6" x-gap="16" y-gap="16">
-        <n-grid-item
+    </n-card>
+    <n-card v-if="images.length === 0">Добавьте первое изображение</n-card>
+    <n-grid v-else cols="2 s:3 m:4 l:5 xl:6 2xl:8" responsive="screen" x-gap="16" y-gap="16">
+      <n-grid-item
           v-for="image in images"
           :key="image.id"
-        >
+      >
+        <n-card content-style="padding: 0">
           <n-image
               :class="{'selected': image.main}"
               :src="`/api/files/images/${image.source}`"
           />
-          <n-button-group>
+          <n-button-group style="padding-bottom: 10px; width: 100%; justify-content: center">
             <a download="avatar.png" :href="`/api/files/images/${image.source}`">
               <n-button type="info">
                 <n-icon>
@@ -97,7 +97,7 @@ const selectAvatar = (image: ImageType) => {
             </a>
             <n-button type="success" @click="selectAvatar(image)">
               <n-icon>
-                <save-regular />
+                <user-circle />
               </n-icon>
             </n-button>
             <n-button type="error" @click="deleteCurrentImage(image.id)">
@@ -106,25 +106,17 @@ const selectAvatar = (image: ImageType) => {
               </n-icon>
             </n-button>
           </n-button-group>
-        </n-grid-item>
-      </n-grid>
-    </n-card>
+        </n-card>
+      </n-grid-item>
+    </n-grid>
   </div>
 </template>
 
 <style lang="scss">
-.button {
-  padding-bottom: 24px;
-}
-
 .n-grid > div {
   position: relative;
   display: flex;
   flex-direction: column;
-
-  .n-button {
-    margin-top: 10px;
-  }
 }
 
 .close {

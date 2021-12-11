@@ -87,9 +87,12 @@ const deleteAll = () => {
 
   <n-grid cols="2 s:3 m:4 l:5 xl:6 2xl:8" responsive="screen" x-gap="16" y-gap="16">
     <n-gi v-for="image in images" :key="image.id">
-      <n-card>
-        <n-image :src="`/api/files/images/${image.source}`" class="printsPage__image" />
-        <n-button-group>
+      <n-card content-style="padding: 0">
+        <n-image
+            :src="`/api/files/images/${image.source}`"
+            class="printsPage__image"
+        />
+        <n-button-group style="padding-bottom: 10px; width: 100%; justify-content: center">
           <n-button type="success" @click="toAvatar(image.id)">
             <template #icon>
               <n-icon><save-regular /></n-icon>

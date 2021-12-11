@@ -5,20 +5,28 @@ import {
   NIcon,
   NButton,
   NInput,
-  NSpace,
+  NSpace, useMessage,
 } from 'naive-ui';
 import {Forward as ForwardRegular, SaveRegular} from '@vicons/fa';
 import {generateImage, saveImage} from '~/api/images';
 
+const message = useMessage();
+
 const image = ref('');
 const search = ref('');
+const isRequest = ref(false);
 
 const nextImage = () => {
+  isRequest.value = true;
   generateImage({
     phrase: search.value,
     tags: ['test', 'tag'],
   }).then(({data}) => {
     image.value = data.source;
+  }).catch(() => {
+    message.error('Во время генерации изображения произошла ошибка');
+  }).finally(() => {
+    isRequest.value = false;
   });
 };
 
@@ -37,21 +45,19 @@ const likeImage = () => {
           :src="`/api/files/temporary/${image}`"
       />
     </div>
-    <div class="buttonsContainer">
-      <n-space justify="space-between" align="center">
-        <n-button @click="likeImage" class="buttonAction" strong secondary circle>
-          <n-icon>
-            <save-regular />
-          </n-icon>
-        </n-button>
-        <n-input @keydown.enter="nextImage" v-model:value="search" type="text" placeholder="Найти аватарку" />
-        <n-button @click="nextImage" class="buttonAction" strong secondary circle>
-          <n-icon>
-            <forward-regular />
-          </n-icon>
-        </n-button>
-      </n-space>
-    </div>
+    <n-space justify="center" align="center">
+      <n-button @click="likeImage" strong secondary circle>
+        <n-icon>
+          <save-regular />
+        </n-icon>
+      </n-button>
+      <n-input @keydown.enter="nextImage" v-model:value="search" type="text" placeholder="Найти аватарку" />
+      <n-button @click="nextImage" type="success" strong secondary circle :loader="isRequest">
+        <n-icon>
+          <forward-regular />
+        </n-icon>
+      </n-button>
+    </n-space>
   </div>
 </template>
 
@@ -64,11 +70,5 @@ const likeImage = () => {
 .buttonsContainer {
   display: flex;
   justify-content: space-between;
-}
-
-.buttonAction {
-  font-size: 70px;
-  width: 90px;
-  height: 90px;
 }
 </style>
