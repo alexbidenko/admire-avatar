@@ -67,6 +67,28 @@ func SignIn(w http.ResponseWriter, r *http.Request) {
 	utils.WriteJsonResponse(w, user.BaseUser)
 }
 
+func ChangePassword(w http.ResponseWriter, r *middlewares.AuthorizedRequest) {
+	var userModule modules.UserModule
+	var user entities.User
+	utils.ParseRequestBody(w, r.Request, &user)
+
+	bytes, err := bcrypt.GenerateFromPassword([]byte(user.Password), 14)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	data, err := userModule.GetByEmail(r.User.Email)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusNotFound)
+		return
+	}
+	data.Password = string(bytes)
+	userModule.Update(data.ID, &data)
+
+	utils.WriteJsonResponse(w, nil)
+}
+
 func Refresh(w http.ResponseWriter, r *http.Request) {
 	var ctx = context.Background()
 	refreshTokenCookie, err := r.Cookie("refresh_token")

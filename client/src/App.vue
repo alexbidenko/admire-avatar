@@ -71,4 +71,17 @@ a {
   border-top-right-radius: 0!important;
   border-bottom-right-radius: 0!important;
 }
+
+.squareImageCard {
+  padding-top: 100%;
+  position: relative;
+
+  .n-image {
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    position: absolute;
+  }
+}
 </style>

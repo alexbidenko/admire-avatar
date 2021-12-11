@@ -40,10 +40,13 @@ const likeImage = () => {
 <template>
   <div class="container">
     <n-space justify="center">
-      <n-image
-          class="generatePage__image"
-          :src="`/api/files/temporary/${image}`"
-      />
+      <div class="squareImageCard">
+        <n-image
+            v-if="image"
+            class="generatePage__image"
+            :src="`/api/files/temporary/${image}`"
+        />
+      </div>
     </n-space>
     <n-space justify="center" align="center">
       <n-button @click="likeImage" strong secondary circle>

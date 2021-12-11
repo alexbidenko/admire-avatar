@@ -23,6 +23,11 @@ const LINKS = [
 
 const OPTIONS = [
   {
+    label: 'Изменить пароль',
+    key: 'password',
+    to: '/password',
+  },
+  {
     label: 'Выйти',
     key: 'logout',
   },
@@ -39,6 +44,9 @@ const onSelectDropdownOption = (key: string) => {
       store.commit('logout');
       router.push('/auth');
     });
+    break;
+  default:
+    router.push(OPTIONS.find((el) => el.key === key)?.to || '');
     break;
   }
 };
@@ -77,9 +85,13 @@ getAvatar().then(({data}) => {
       </n-space>
     </n-layout-header>
     <n-scrollbar class="authorizedLayout__scrollbar scrollContainer">
-      <router-view />
+      <router-view v-slot="{ Component }">
+        <transition name="scale" mode="out-in">
+          <component :is="Component" />
+        </transition>
+      </router-view>
 
-      <n-back-top :right="100" />
+      <n-back-top />
     </n-scrollbar>
   </n-layout>
 </template>

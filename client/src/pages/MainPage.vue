@@ -10,10 +10,9 @@ import {
 } from 'naive-ui';
 import {getImages, deleteImage, createAvatar} from '~/api/images';
 import {FolderType, ImageType} from '~/types/image';
-import {Download as DownloadRegular, UserCircle, TrashAlt, Share as ShareRegular} from '@vicons/fa';
+import {Download as DownloadRegular, UserCircle, TrashAlt, Share as ShareRegular, FolderPlus} from '@vicons/fa';
 import {useMainStore} from '~/store';
 import $axios from '~/api';
-import {useRoute} from 'vue-router';
 
 const COUNT = 40;
 
@@ -139,12 +138,16 @@ const handleSelect = (key: number, image: ImageType) => {
   <div class="container">
     <n-h1>Генерация аватарок</n-h1>
     <n-card>
-      <n-button-group>
+      <n-space justify="space-between">
         <router-link to="/generate">
           <n-button type="warning">Сгенерировать</n-button>
         </router-link>
-        <n-button type="success" @click="showModal = !showModal">Директория</n-button>
-      </n-button-group>
+        <n-button type="success" @click="showModal = !showModal">
+          <n-icon>
+            <folder-plus />
+          </n-icon>
+        </n-button>
+      </n-space>
     </n-card>
     <n-card style="margin-top: 32px" v-if="!images.length && !folders.length">Добавьте первое изображение</n-card>
     <n-grid style="margin-top: 32px" v-if="folders.length" cols="2 s:3 m:4 l:5 xl:6 2xl:8" responsive="screen" x-gap="16" y-gap="16">
@@ -169,10 +172,12 @@ const handleSelect = (key: number, image: ImageType) => {
         :key="image.id"
       >
         <n-card content-style="padding: 0">
-          <n-image
-              :class="{'selected': image.main}"
-              :src="`/api/files/images/${image.source}`"
-          />
+          <div class="squareImageCard">
+            <n-image
+                :class="{'selected': image.main}"
+                :src="`/api/files/images/${image.source}`"
+            />
+          </div>
           <n-button-group style="padding-bottom: 10px; width: 100%; justify-content: center">
             <a download="avatar.png" :href="`/api/files/images/${image.source}`">
               <n-button type="info">

@@ -5,7 +5,9 @@ import RegistrationPage from './pages/RegistrationPage.vue';
 import MainPage from '~/pages/MainPage.vue';
 import FolderPage from '~/pages/FolderPage.vue';
 import GeneratePage from '~/pages/GeneratePage.vue';
+import PasswordPage from '~/pages/PasswordPage.vue';
 import PrintsPage from '~/pages/PrintsPage.vue';
+import NotFoundPage from '~/pages/NotFoundPage.vue';
 
 const routes = [
   {
@@ -42,6 +44,16 @@ const routes = [
         path: '/prints',
         name: 'Prints',
         component: PrintsPage,
+      },
+      {
+        path: '/password',
+        name: 'Password',
+        component: PasswordPage,
+      },
+      {
+        path: '/:pathMatch(.*)*',
+        name: 'NotFound',
+        component: NotFoundPage,
       },
     ],
   },

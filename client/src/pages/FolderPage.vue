@@ -80,10 +80,12 @@ const handleSelect = (key: number, image: ImageType) => {
         :key="image.id"
       >
         <n-card content-style="padding: 0">
-          <n-image
-              :class="{'selected': image.main}"
-              :src="`/api/files/images/${image.source}`"
-          />
+          <div class="squareImageCard">
+            <n-image
+                :class="{'selected': image.main}"
+                :src="`/api/files/images/${image.source}`"
+            />
+          </div>
           <n-button-group style="padding-bottom: 10px; width: 100%; justify-content: center">
             <a download="avatar.png" :href="`/api/files/images/${image.source}`">
               <n-button type="info">
