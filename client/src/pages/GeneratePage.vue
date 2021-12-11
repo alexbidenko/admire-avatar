@@ -52,8 +52,8 @@ const likeImage = () => {
         </n-icon>
       </n-button>
       <n-input @keydown.enter="nextImage" v-model:value="search" type="text" placeholder="Найти аватарку" />
-      <n-button @click="nextImage" type="success" strong secondary circle :loader="isRequest">
-        <n-icon>
+      <n-button class="generatePage__icon" @click="nextImage" type="success" strong secondary circle :disabled="isRequest" :loading="isRequest">
+        <n-icon v-if="!isRequest">
           <forward-regular />
         </n-icon>
       </n-button>
@@ -74,6 +74,12 @@ const likeImage = () => {
 
   &__image img {
     object-fit: cover;
+  }
+
+  &__icon {
+    .n-button__icon {
+      margin: 0;
+    }
   }
 }
 </style>
