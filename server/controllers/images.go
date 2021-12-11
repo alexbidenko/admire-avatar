@@ -14,6 +14,25 @@ import (
 	"strings"
 )
 
+func GetFolderImages(w http.ResponseWriter, r *middlewares.AuthorizedRequest) {
+	var imageModule modules.ImageModule
+	id := mux.Vars(r.Request)["id"]
+
+	images := imageModule.GetByFolder(r.User.ID, id, "avatar")
+
+	utils.WriteJsonResponse(w, images)
+}
+
+func ImageToFolder(w http.ResponseWriter, r *middlewares.AuthorizedRequest) {
+	var imageModule modules.ImageModule
+	id := mux.Vars(r.Request)["id"]
+	folderId := mux.Vars(r.Request)["folderId"]
+
+	imageModule.ImageToFolder(r.User.ID, id, folderId)
+
+	utils.WriteJsonResponse(w, true)
+}
+
 func GetPaginatedImages(w http.ResponseWriter, r *middlewares.AuthorizedRequest) {
 	var imageModule modules.ImageModule
 	offset, err := strconv.Atoi(mux.Vars(r.Request)["offset"])

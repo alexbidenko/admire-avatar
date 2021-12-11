@@ -10,8 +10,18 @@ type ImageModule struct {
 
 func (i *ImageModule) Get(userID uint, imageType string) []entities.Image {
 	images := make([]entities.Image, 0)
-	config.DB.Model(&entities.Image{}).Where("user_id = ?", userID).Where("type = ?", imageType).Order("created_at desc").Find(&images)
+	config.DB.Model(&entities.Image{}).Where("user_id = ?", userID).Where("folder_id = ?", 0).Where("type = ?", imageType).Order("created_at desc").Find(&images)
 	return images
+}
+
+func (i *ImageModule) GetByFolder(userID uint, folderID, imageType string) []entities.Image {
+	images := make([]entities.Image, 0)
+	config.DB.Model(&entities.Image{}).Where("user_id = ?", userID).Where("folder_id = ?", folderID).Where("type = ?", imageType).Order("created_at desc").Find(&images)
+	return images
+}
+
+func (i *ImageModule) ImageToFolder(userID uint, imageId string, folderID string) {
+	config.DB.Model(&entities.Image{}).Where("user_id = ?", userID).Where("id = ?", imageId).Update("folder_id", folderID)
 }
 
 func (i *ImageModule) Paginate(userID uint, imageType string, offset int, limit int) []entities.Image {
@@ -19,6 +29,7 @@ func (i *ImageModule) Paginate(userID uint, imageType string, offset int, limit 
 	config.DB.Model(&entities.Image{}).
 		Where("user_id = ?", userID).
 		Where("type = ?", imageType).
+		Where("folder_id = ?", 0).
 		Offset(offset).
 		Limit(limit).
 		Order("created_at desc").
@@ -55,6 +66,6 @@ func (i *ImageModule) CreateAvatar(userID uint, imageID string) {
 	config.DB.Model(&entities.Image{}).Where("user_id = ?", userID).Where("id = ?", imageID).Update("main", true)
 }
 
-func (i *ImageModule) PrintToAvatar(userID uint, imageID string) {
-	config.DB.Model(&entities.Image{}).Where("id = ?", imageID).Update("type", "avatar")
+func (i *ImageModule) PrintToAvatar(userID uint, imageID string) error {
+	return config.DB.Model(&entities.Image{}).Where("user_id = ?", userID).Where("id = ?", imageID).Update("type", "avatar").Error
 }

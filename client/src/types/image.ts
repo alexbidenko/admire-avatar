@@ -12,6 +12,7 @@ export type BaseImageType = {
 export type ImageType = {
   id: number;
   userId: number;
+  folderId: number;
   createdAt: string;
   updatedAt: string;
   type: ImageTypeEnum;
@@ -21,4 +22,12 @@ export type ImageType = {
 export type ImageInputType = {
   phrase: string;
   tags: string[];
+};
+
+export type FolderType = {
+  id: number;
+  name: string;
+  userId: number;
+  createdAt: string;
+  updatedAt: string;
 };

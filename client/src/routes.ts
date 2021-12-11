@@ -3,6 +3,7 @@ import AuthLayout from './layout/AuthLayout.vue';
 import AuthPage from './pages/AuthPage.vue';
 import RegistrationPage from './pages/RegistrationPage.vue';
 import MainPage from '~/pages/MainPage.vue';
+import FolderPage from '~/pages/FolderPage.vue';
 import GeneratePage from '~/pages/GeneratePage.vue';
 import PrintsPage from '~/pages/PrintsPage.vue';
 
@@ -26,6 +27,11 @@ const routes = [
         path: '/',
         name: 'main',
         component: MainPage,
+      },
+      {
+        path: '/folder/:folderId',
+        name: 'folder',
+        component: FolderPage,
       },
       {
         path: '/generate',

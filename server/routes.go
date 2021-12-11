@@ -23,18 +23,25 @@ func initRoutes() http.Handler {
 	s.HandleFunc("/user/refresh", controllers.Refresh).Methods("POST")
 	s.HandleFunc("/user", middlewares.Auth(controllers.GetUserByToken)).Methods("GET")
 
-	s.HandleFunc("/images/{offset}/{limit}", middlewares.Auth(controllers.GetPaginatedImages)).Methods("GET")
 	s.HandleFunc("/images", middlewares.Auth(controllers.SaveImage)).Methods("POST")
 	s.HandleFunc("/images", middlewares.Auth(controllers.GenerateImage)).Methods("PUT")
 	s.HandleFunc("/images/avatar", middlewares.Auth(controllers.GetAvatar)).Methods("GET")
+	s.HandleFunc("/images/folder/{id}", middlewares.Auth(controllers.GetFolderImages)).Methods("GET")
+	s.HandleFunc("/images/{id}/folder/{folderId}", middlewares.Auth(controllers.ImageToFolder)).Methods("PUT")
 	s.HandleFunc("/images/{id}", middlewares.Auth(controllers.RemoveImage)).Methods("DELETE")
 	s.HandleFunc("/images/{id}", middlewares.Auth(controllers.CreateAvatar)).Methods("PUT")
 	s.HandleFunc("/images/{id}", middlewares.Auth(controllers.GetImage)).Methods("GET")
+	s.HandleFunc("/images/{offset}/{limit}", middlewares.Auth(controllers.GetPaginatedImages)).Methods("GET")
 
 	s.HandleFunc("/prints/{offset}/{limit}", middlewares.Auth(controllers.GetPaginatedPrints)).Methods("GET")
 	s.HandleFunc("/prints", middlewares.Auth(controllers.GeneratePrints)).Methods("POST")
 	s.HandleFunc("/prints/{id}", middlewares.Auth(controllers.PrintToAvatar)).Methods("PUT")
 	s.HandleFunc("/prints", middlewares.Auth(controllers.Clear)).Methods("DELETE")
+	s.HandleFunc("/prints/archive", middlewares.Auth(controllers.DownloadArchive)).Methods("GET")
+
+	s.HandleFunc("/folders", middlewares.Auth(controllers.GetFolders)).Methods("GET")
+	s.HandleFunc("/folders", middlewares.Auth(controllers.CreateFolder)).Methods("POST")
+	s.HandleFunc("/folders/{id}", middlewares.Auth(controllers.DeleteFolder)).Methods("DELETE")
 
 	s.HandleFunc("/admire-avatar/{emailHash}", controllers.GetImageByEmail).Methods("GET")
 
