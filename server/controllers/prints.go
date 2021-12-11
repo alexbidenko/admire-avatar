@@ -5,10 +5,12 @@ import (
 	"admire-avatar/middlewares"
 	"admire-avatar/modules"
 	"admire-avatar/utils"
+	"admire-avatar/ws"
 	"fmt"
 	"github.com/gorilla/mux"
 	"net/http"
 	"os"
+	"strconv"
 	"time"
 )
 
@@ -35,7 +37,7 @@ func GeneratePrints(w http.ResponseWriter, r *middlewares.AuthorizedRequest) {
 					BaseImage: entities.BaseImage{
 						Source: filename,
 					},
-					UserId: r.User.ID,
+					UserID: r.User.ID,
 					Type:   "print",
 				}
 				imageModule.Create(&image)
@@ -44,6 +46,8 @@ func GeneratePrints(w http.ResponseWriter, r *middlewares.AuthorizedRequest) {
 				if err != nil {
 					fmt.Println(err)
 				}
+
+				ws.PrintsPool.Broadcast <- ws.Message{Body: image, User: &r.User}
 			}
 		}
 	}()
@@ -51,10 +55,20 @@ func GeneratePrints(w http.ResponseWriter, r *middlewares.AuthorizedRequest) {
 	utils.WriteJsonResponse(w, true)
 }
 
-func GetPrints(w http.ResponseWriter, r *middlewares.AuthorizedRequest) {
+func GetPaginatedPrints(w http.ResponseWriter, r *middlewares.AuthorizedRequest) {
 	var imageModule modules.ImageModule
+	offset, err := strconv.Atoi(mux.Vars(r.Request)["offset"])
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+	limit, err := strconv.Atoi(mux.Vars(r.Request)["limit"])
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
 
-	images := imageModule.Get(r.User.ID, "print")
+	images := imageModule.Paginate(r.User.ID, "print", offset, limit)
 
 	utils.WriteJsonResponse(w, images)
 }
@@ -64,6 +78,22 @@ func PrintToAvatar(w http.ResponseWriter, r *middlewares.AuthorizedRequest) {
 	imageID := mux.Vars(r.Request)["id"]
 
 	imageModule.PrintToAvatar(r.User.ID, imageID)
+
+	utils.WriteJsonResponse(w, true)
+}
+
+func Clear(w http.ResponseWriter, r *middlewares.AuthorizedRequest) {
+	var imageModule modules.ImageModule
+
+	images := imageModule.Get(r.User.ID, "print")
+	for _, image := range images {
+		err := os.Remove("files/images/" + image.Source)
+		if err != nil {
+			fmt.Println(err)
+		}
+	}
+
+	imageModule.Clear(r.User.ID, "print")
 
 	utils.WriteJsonResponse(w, true)
 }

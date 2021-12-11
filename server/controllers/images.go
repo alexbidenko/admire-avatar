@@ -10,12 +10,24 @@ import (
 	"io/ioutil"
 	"net/http"
 	"os"
+	"strconv"
 	"strings"
 )
 
-func GetImages(w http.ResponseWriter, r *middlewares.AuthorizedRequest) {
+func GetPaginatedImages(w http.ResponseWriter, r *middlewares.AuthorizedRequest) {
 	var imageModule modules.ImageModule
-	images := imageModule.Get(r.User.ID, "avatar")
+	offset, err := strconv.Atoi(mux.Vars(r.Request)["offset"])
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+	limit, err := strconv.Atoi(mux.Vars(r.Request)["limit"])
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	images := imageModule.Paginate(r.User.ID, "avatar", offset, limit)
 
 	utils.WriteJsonResponse(w, images)
 }
@@ -63,7 +75,7 @@ func SaveImage(w http.ResponseWriter, r *middlewares.AuthorizedRequest) {
 
 	image := entities.Image{
 		BaseImage: data,
-		UserId:    r.User.ID,
+		UserID:    r.User.ID,
 		Type:      "avatar",
 	}
 	imageModule.Create(&image)
@@ -111,6 +123,18 @@ func GetImage(w http.ResponseWriter, r *middlewares.AuthorizedRequest) {
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
+}
+
+func GetAvatar(w http.ResponseWriter, r *middlewares.AuthorizedRequest) {
+	var imageModule modules.ImageModule
+
+	avatar, err := imageModule.GetAvatar(r.User.ID)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusNotFound)
+		return
+	}
+
+	utils.WriteJsonResponse(w, avatar)
 }
 
 func GetImageByEmail(w http.ResponseWriter, r *http.Request) {

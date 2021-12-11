@@ -14,6 +14,10 @@ type BaseUser struct {
 	Name  string `json:"name"`
 }
 
+func (BaseUser) TableName() string {
+	return "users"
+}
+
 type User struct {
 	BaseUser
 	Password  string `json:"password"`
