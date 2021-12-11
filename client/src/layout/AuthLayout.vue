@@ -75,7 +75,7 @@ getAvatar().then(({data}) => {
         </n-dropdown>
       </n-space>
     </n-layout-header>
-    <n-scrollbar class="authorizedLayout__scrollbar">
+    <n-scrollbar class="authorizedLayout__scrollbar scrollContainer">
       <router-view />
     </n-scrollbar>
   </n-layout>

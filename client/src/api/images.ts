@@ -1,7 +1,7 @@
 import $axios from './index';
 import {BaseImageType, ImageInputType, ImageType} from '~/types/image';
 
-export const getImages = () => $axios.get<ImageType[]>('images/0/100');
+export const getImages = (offset: number, limit: number) => $axios.get<ImageType[]>(`images/${offset}/${limit}`);
 
 export const generateImage = (data: ImageInputType) => $axios.put<BaseImageType>('images', data);
 
