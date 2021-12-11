@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import {ref} from 'vue';
+import {onUnmounted, ref} from 'vue';
 import {
   NButton, NButtonGroup,
   NCard,
@@ -13,9 +13,9 @@ import {
   useLoadingBar,
   useMessage,
 } from 'naive-ui';
-import {generatePrints, getPrints} from '~/api/prints';
+import {generatePrints, getPrints, saveAsAvatar} from '~/api/prints';
 import {ImageType} from '~/types/image';
-import {TrashAltRegular} from '@vicons/fa';
+import {SaveRegular, TrashAltRegular} from '@vicons/fa';
 import {deleteImage} from '~/api/images';
 
 const loader = useLoadingBar();
@@ -37,7 +37,7 @@ const generate = () => {
     phrase: phrase.value,
     tags: [],
   }).then(() => {
-    message.info('Генерация принтов запущено');
+    message.info('Генерация принтов запущена');
   }).catch(() => {
     loader.error();
     message.error('Во время генерация принтов произшла ошибка');
@@ -50,6 +50,22 @@ const deletePrint = (id: number) => {
     images.value = images.value.filter((el) => el.id !== id);
   }).catch(loader.error).finally(loader.finish);
 };
+
+const toAvatar = (id: number) => {
+  loader.start();
+  saveAsAvatar(id).then(() => {
+    images.value = images.value.filter((el) => el.id !== id);
+  }).catch(loader.error).finally(loader.finish);
+};
+
+const timer = setInterval(() => {
+  getPrints().then(({data}) => {
+    images.value = data;
+  });
+}, 5000);
+onUnmounted(() => {
+  clearInterval(timer);
+});
 </script>
 
 <template>
@@ -67,6 +83,11 @@ const deletePrint = (id: number) => {
       <n-card>
         <n-image :src="`/api/files/images/${image.source}`" class="printsPage__image" />
         <n-button-group>
+          <n-button type="success" @click="toAvatar(image.id)">
+            <template #icon>
+              <n-icon><save-regular /></n-icon>
+            </template>
+          </n-button>
           <n-button type="error" @click="deletePrint(image.id)">
             <template #icon>
               <n-icon><trash-alt-regular /></n-icon>

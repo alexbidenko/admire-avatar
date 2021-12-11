@@ -6,6 +6,7 @@ import (
 	"admire-avatar/modules"
 	"admire-avatar/utils"
 	"fmt"
+	"github.com/gorilla/mux"
 	"net/http"
 	"os"
 	"time"
@@ -56,4 +57,13 @@ func GetPrints(w http.ResponseWriter, r *middlewares.AuthorizedRequest) {
 	images := imageModule.Get(r.User.ID, "print")
 
 	utils.WriteJsonResponse(w, images)
+}
+
+func PrintToAvatar(w http.ResponseWriter, r *middlewares.AuthorizedRequest) {
+	var imageModule modules.ImageModule
+	imageID := mux.Vars(r.Request)["id"]
+
+	imageModule.PrintToAvatar(r.User.ID, imageID)
+
+	utils.WriteJsonResponse(w, true)
 }

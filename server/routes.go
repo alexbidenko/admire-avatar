@@ -29,6 +29,7 @@ func initRoutes() http.Handler {
 
 	s.HandleFunc("/prints", middlewares.Auth(controllers.GetPrints)).Methods("GET")
 	s.HandleFunc("/prints", middlewares.Auth(controllers.GeneratePrints)).Methods("POST")
+	s.HandleFunc("/prints/{id}", middlewares.Auth(controllers.PrintToAvatar)).Methods("PUT")
 
 	s.HandleFunc("/admire-avatar/{emailHash}", controllers.GetImageByEmail).Methods("GET")
 
