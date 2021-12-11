@@ -3,9 +3,10 @@ import {signIn} from '~/api/users';
 import {ref} from 'vue';
 import {useRouter} from 'vue-router';
 import {
-  NButton, NCard, NInput, NSpace,
+  NButton, NCard, NInput, NSpace, useLoadingBar,
 } from 'naive-ui';
 
+const loader = useLoadingBar();
 const router= useRouter();
 
 const email = ref('');
@@ -14,9 +15,10 @@ const password = ref('');
 if (document.cookie.includes('authorized=true')) router.push('/');
 
 const submit = () => {
+  loader.start();
   signIn(email.value, password.value).then(() => {
     router.push('/');
-  });
+  }).catch(loader.error).finally(loader.finish);
 };
 </script>
 

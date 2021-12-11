@@ -3,9 +3,10 @@ import {signUp} from '~/api/users';
 import {useRouter} from 'vue-router';
 import {ref} from 'vue';
 import {
-  NButton, NCard, NInput, NSpace,
+  NButton, NCard, NInput, NSpace, useLoadingBar,
 } from 'naive-ui';
 
+const loader = useLoadingBar();
 const router = useRouter();
 
 const name = ref('');
@@ -16,10 +17,11 @@ const email = ref('');
 if (document.cookie.includes('authorized=true')) router.push('/');
 
 const submit = () => {
+  loader.start();
   signUp({name: name.value, email: email.value, password: password.value})
     .then(() => {
       router.push('/');
-    });
+    }).catch(loader.error).finally(loader.finish);
 };
 </script>
 
@@ -37,6 +39,9 @@ const submit = () => {
           Повторный пароль
           <n-input placeholder="Повторите пароль" type="password" name="repeatPassword" v-model:value="repeatPassword" show-password-on="click" />
           <n-button type="primary" attr-type="submit" class="authPage__button" :disabled="password !== repeatPassword || password.length < 8">Зарегистрироваться</n-button>
+          <router-link to="/auth">
+            <n-button attr-type="submit" style="margin-top: 16px; width: 100%">Войти</n-button>
+          </router-link>
         </n-space>
       </form>
     </n-card>

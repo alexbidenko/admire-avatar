@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import {onUnmounted, ref} from 'vue';
+import {ref} from 'vue';
 import {
   NButton, NButtonGroup,
   NCard,
@@ -13,7 +13,7 @@ import {
   useLoadingBar,
   useMessage,
 } from 'naive-ui';
-import {generatePrints, getPrints, saveAsAvatar} from '~/api/prints';
+import {clear, generatePrints, getPrints, saveAsAvatar} from '~/api/prints';
 import {ImageType} from '~/types/image';
 import {SaveRegular, TrashAltRegular} from '@vicons/fa';
 import {deleteImage} from '~/api/images';
@@ -24,6 +24,12 @@ const message = useMessage();
 const phrase = ref('');
 const count = ref(1);
 const images = ref<ImageType[]>([]);
+
+const ws = new WebSocket(`${location.protocol === 'https' ? 'wss' : 'ws'}://${location.host}/api/prints/channel`);
+
+ws.onmessage = (e: MessageEvent<string>) => {
+  images.value.unshift(JSON.parse(e.data));
+};
 
 loader.start();
 getPrints().then(({data}) => {
@@ -58,14 +64,12 @@ const toAvatar = (id: number) => {
   }).catch(loader.error).finally(loader.finish);
 };
 
-const timer = setInterval(() => {
-  getPrints().then(({data}) => {
-    images.value = data;
-  });
-}, 5000);
-onUnmounted(() => {
-  clearInterval(timer);
-});
+const deleteAll = () => {
+  loader.start();
+  clear().then(() => {
+    images.value = [];
+  }).catch(loader.error).finally(loader.finish);
+};
 </script>
 
 <template>
@@ -75,7 +79,10 @@ onUnmounted(() => {
       <n-input placeholder="Поисковая фраза" v-model:value="phrase" />
       <n-input-number v-model:value="count" :min="1" />
     </n-input-group>
-    <n-button @click="generate" type="primary" style="margin-top: 16px">Сгенерировать</n-button>
+    <n-button-group>
+      <n-button @click="generate" type="primary" style="margin-top: 16px">Сгенерировать</n-button>
+      <n-button @click="deleteAll" type="error" style="margin-top: 16px">Очистить</n-button>
+    </n-button-group>
   </n-card>
 
   <n-grid cols="2 s:3 m:4 l:5 xl:6 2xl:8" responsive="screen" x-gap="16" y-gap="16">

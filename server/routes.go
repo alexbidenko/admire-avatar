@@ -3,6 +3,7 @@ package main
 import (
 	"admire-avatar/controllers"
 	"admire-avatar/middlewares"
+	"admire-avatar/ws"
 	"github.com/gorilla/mux"
 	"net/http"
 	"os"
@@ -11,6 +12,8 @@ import (
 )
 
 func initRoutes() http.Handler {
+	go ws.PrintsPool.Start()
+
 	r := mux.NewRouter()
 	s := r.PathPrefix("/api").Subrouter()
 
@@ -20,21 +23,27 @@ func initRoutes() http.Handler {
 	s.HandleFunc("/user/refresh", controllers.Refresh).Methods("POST")
 	s.HandleFunc("/user", middlewares.Auth(controllers.GetUserByToken)).Methods("GET")
 
-	s.HandleFunc("/images", middlewares.Auth(controllers.GetImages)).Methods("GET")
+	s.HandleFunc("/images/{offset}/{limit}", middlewares.Auth(controllers.GetPaginatedImages)).Methods("GET")
 	s.HandleFunc("/images", middlewares.Auth(controllers.SaveImage)).Methods("POST")
 	s.HandleFunc("/images", middlewares.Auth(controllers.GenerateImage)).Methods("PUT")
+	s.HandleFunc("/images/avatar", middlewares.Auth(controllers.GetAvatar)).Methods("GET")
 	s.HandleFunc("/images/{id}", middlewares.Auth(controllers.RemoveImage)).Methods("DELETE")
 	s.HandleFunc("/images/{id}", middlewares.Auth(controllers.CreateAvatar)).Methods("PUT")
 	s.HandleFunc("/images/{id}", middlewares.Auth(controllers.GetImage)).Methods("GET")
 
-	s.HandleFunc("/prints", middlewares.Auth(controllers.GetPrints)).Methods("GET")
+	s.HandleFunc("/prints/{offset}/{limit}", middlewares.Auth(controllers.GetPaginatedPrints)).Methods("GET")
 	s.HandleFunc("/prints", middlewares.Auth(controllers.GeneratePrints)).Methods("POST")
 	s.HandleFunc("/prints/{id}", middlewares.Auth(controllers.PrintToAvatar)).Methods("PUT")
+	s.HandleFunc("/prints", middlewares.Auth(controllers.Clear)).Methods("DELETE")
 
 	s.HandleFunc("/admire-avatar/{emailHash}", controllers.GetImageByEmail).Methods("GET")
 
 	s.PathPrefix("/files/temporary/").Handler(http.StripPrefix("/api/files/temporary/", http.FileServer(http.Dir("files/temporary"))))
 	s.PathPrefix("/files/images/").Handler(http.StripPrefix("/api/files/images/", http.FileServer(http.Dir("files/images"))))
+
+	s.HandleFunc("/prints/channel", middlewares.Auth(func(w http.ResponseWriter, r *middlewares.AuthorizedRequest) {
+		ws.ServeWs(ws.PrintsPool, w, r)
+	}))
 
 	if os.Getenv("MODE") == "production" {
 		r.PathPrefix("/").HandlerFunc(func(w http.ResponseWriter, r *http.Request) {

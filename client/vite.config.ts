@@ -6,7 +6,10 @@ export default defineConfig({
   plugins: [vue()],
   server: {
     proxy: {
-      '/api': 'http://192.168.43.182:7015',
+      '/api': {
+        'target': 'http://192.168.43.182:7015',
+        'ws': true,
+      },
     },
   },
   alias: {

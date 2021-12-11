@@ -38,8 +38,8 @@ func (userModule *UserModule) GetByHash(emailHash string) (entities.User, error)
 	return user, err
 }
 
-func (userModule *UserModule) Find(ID uint) (entities.User, error) {
-	var user entities.User
+func (userModule *UserModule) Find(ID uint) (entities.BaseUser, error) {
+	var user entities.BaseUser
 	err := config.DB.Model(&entities.User{}).First(&user, "id = ?", ID).Error
 	return user, err
 }

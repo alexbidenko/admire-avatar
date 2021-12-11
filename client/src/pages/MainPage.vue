@@ -7,17 +7,22 @@ import {
   NImage,
   NH3,
   NGrid,
-  NGridItem, NIcon,
+  NGridItem, NIcon, useLoadingBar,
 } from 'naive-ui';
 import {getImages, deleteImage, createAvatar} from '~/api/images';
 import {ImageType} from '~/types/image';
 import {Download as DownloadRegular, SaveRegular, TrashAlt} from '@vicons/fa';
+import {useMainStore} from '~/store';
+
+const loader = useLoadingBar();
+const store = useMainStore();
 
 const images = ref<ImageType[]>([]);
 
+loader.start();
 getImages().then(({data}) => {
   images.value = data;
-});
+}).catch(loader.error).finally(loader.finish);
 
 const deleteCurrentImage = (id: number) => {
   deleteImage(id).then(() => {
@@ -27,16 +32,25 @@ const deleteCurrentImage = (id: number) => {
 
 const selectAvatar = (image: ImageType) => {
   createAvatar(image.id).then(() => {
+    images.value.forEach((el) => {
+      el.main = false;
+    });
     image.main = true;
+    store.commit('setAvatar', image);
   });
 };
 </script>
 
 <template>
   <div class="container">
+    <n-button-group class="button">
+      <router-link to="/generate">
+        <n-button type="warning">Добавить новое изображение</n-button>
+      </router-link>
+    </n-button-group>
     <n-card>
       <n-h3 v-if="images.length === 0">Добавьте первое изображение</n-h3>
-      <n-grid cols="2 375:3 600:4 700:5 1200:6">
+      <n-grid cols="2 375:3 600:4 700:5 1200:6" x-gap="16" y-gap="16">
         <n-grid-item
           v-for="image in images"
           :key="image.id"
@@ -67,17 +81,12 @@ const selectAvatar = (image: ImageType) => {
         </n-grid-item>
       </n-grid>
     </n-card>
-    <n-button-group class="button">
-      <router-link to="/generate">
-        <n-button type="warning">Добавить новое изображение</n-button>
-      </router-link>
-    </n-button-group>
   </div>
 </template>
 
 <style lang="scss">
 .button {
-  padding-top: 24px;
+  padding-bottom: 24px;
 }
 
 .n-grid > div {

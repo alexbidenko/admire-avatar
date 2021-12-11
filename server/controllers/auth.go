@@ -180,5 +180,13 @@ func writeTokens(w http.ResponseWriter, user *entities.User) {
 }
 
 func GetUserByToken(w http.ResponseWriter, r *middlewares.AuthorizedRequest) {
-	utils.WriteJsonResponse(w, r.User)
+	var userModule modules.UserModule
+
+	user, err := userModule.Find(r.User.ID)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusForbidden)
+		return
+	}
+
+	utils.WriteJsonResponse(w, user)
 }
