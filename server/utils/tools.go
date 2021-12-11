@@ -41,20 +41,10 @@ type GeneratedImage struct {
 func DownloadFile(data GeneratedImage) (string, error) {
 	body, err := json.Marshal(data)
 
-	var resp *http.Response
-	count := 0
-	for resp == nil {
-		resp, err = http.Post("http://192.168.43.7:8000/images/", "application/json", bytes.NewBuffer(body))
-		//resp, err = http.Post("http://192.168.43.251:8000/images/", "application/json", bytes.NewBuffer(body))
-		if err == nil && resp.StatusCode == 404 {
-			fmt.Println("Image not found")
-			return "", err
-		}
-
-		count += 1
-		if count >= 5 && err != nil {
-			return "", err
-		}
+	resp, err := http.Post("http://192.168.43.7:8000/images/", "application/json", bytes.NewBuffer(body))
+	if err == nil && resp.StatusCode == 404 {
+		fmt.Println("Image not found")
+		return "", err
 	}
 
 	defer func() {

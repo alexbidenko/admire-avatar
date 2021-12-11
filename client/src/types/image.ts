@@ -30,4 +30,5 @@ export type FolderType = {
   userId: number;
   createdAt: string;
   updatedAt: string;
+  public: boolean;
 };

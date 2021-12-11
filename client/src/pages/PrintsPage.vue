@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import {ref} from 'vue';
+import {onUnmounted, ref} from 'vue';
 import {
   NButton, NButtonGroup,
   NCard,
@@ -33,6 +33,10 @@ const ws = new WebSocket(`${location.protocol === 'https' ? 'wss' : 'ws'}://${lo
 ws.onmessage = (e: MessageEvent<string>) => {
   images.value.unshift(JSON.parse(e.data));
 };
+
+onUnmounted(() => {
+  ws.close();
+});
 
 loader.start();
 Promise.all([
@@ -86,7 +90,7 @@ const deleteAll = () => {
     <n-card style="margin-bottom: 32px">
       <n-input-group>
         <n-input placeholder="Поисковая фраза" v-model:value="phrase" />
-        <n-select placeholder="Тег" v-model:value="tag" :options="tags" class="printsPage__select" />
+        <n-select placeholder="Тема" v-model:value="tag" :options="tags" class="printsPage__select" />
         <n-input-number v-model:value="count" :min="1" />
       </n-input-group>
       <n-button-group style="margin-top: 16px">

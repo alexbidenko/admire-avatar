@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import {
-  NConfigProvider, NLayout, darkTheme, NLoadingBarProvider, NMessageProvider, NDialogProvider,
+  NConfigProvider, NLayout, darkTheme, NLoadingBarProvider, NMessageProvider, NDialogProvider, NNotificationProvider,
 } from 'naive-ui';
 </script>
 
@@ -8,15 +8,17 @@ import {
   <n-config-provider :theme="darkTheme">
     <n-loading-bar-provider>
       <n-dialog-provider>
-        <n-message-provider placement="bottom">
-          <n-layout>
-            <router-view v-slot="{ Component }">
-              <transition name="scale" mode="out-in">
-                <component :is="Component" />
-              </transition>
-            </router-view>
-          </n-layout>
-        </n-message-provider>
+        <n-notification-provider>
+          <n-message-provider placement="bottom">
+            <n-layout>
+              <router-view v-slot="{ Component }">
+                <transition name="scale" mode="out-in">
+                  <component :is="Component" />
+                </transition>
+              </router-view>
+            </n-layout>
+          </n-message-provider>
+        </n-notification-provider>
       </n-dialog-provider>
     </n-loading-bar-provider>
   </n-config-provider>

@@ -14,9 +14,9 @@ func (i *ImageModule) Get(userID uint, imageType string) []entities.Image {
 	return images
 }
 
-func (i *ImageModule) GetByFolder(userID uint, folderID, imageType string) []entities.Image {
+func (i *ImageModule) GetByFolder(folderID, imageType string) []entities.Image {
 	images := make([]entities.Image, 0)
-	config.DB.Model(&entities.Image{}).Where("user_id = ?", userID).Where("folder_id = ?", folderID).Where("type = ?", imageType).Order("created_at desc").Find(&images)
+	config.DB.Model(&entities.Image{}).Where("folder_id = ?", folderID).Where("type = ?", imageType).Order("created_at desc").Find(&images)
 	return images
 }
 

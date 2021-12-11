@@ -5,6 +5,7 @@ import (
 	"admire-avatar/middlewares"
 	"admire-avatar/modules"
 	"admire-avatar/utils"
+	"admire-avatar/ws"
 	"fmt"
 	"github.com/google/uuid"
 	"github.com/gorilla/mux"
@@ -21,7 +22,7 @@ func GetFolderImages(w http.ResponseWriter, r *middlewares.AuthorizedRequest) {
 	var imageModule modules.ImageModule
 	id := mux.Vars(r.Request)["id"]
 
-	images := imageModule.GetByFolder(r.User.ID, id, "avatar")
+	images := imageModule.GetByFolder(id, "avatar")
 
 	utils.WriteJsonResponse(w, images)
 }
@@ -147,18 +148,6 @@ func GetImage(w http.ResponseWriter, r *middlewares.AuthorizedRequest) {
 	}
 }
 
-func GetAvatar(w http.ResponseWriter, r *middlewares.AuthorizedRequest) {
-	var imageModule modules.ImageModule
-
-	avatar, err := imageModule.GetAvatar(r.User.ID)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusNotFound)
-		return
-	}
-
-	utils.WriteJsonResponse(w, avatar)
-}
-
 func GetImageByEmail(w http.ResponseWriter, r *http.Request) {
 	var userModule modules.UserModule
 	var imageModule modules.ImageModule
@@ -169,15 +158,26 @@ func GetImageByEmail(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusNotFound)
 		return
 	}
+
+	defaultImage := func() {
+		fileBytes, err := ioutil.ReadFile("default.jpg")
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusNotFound)
+			return
+		}
+
+		_, err = w.Write(fileBytes)
+	}
+
 	image, err := imageModule.GetAvatar(user.ID)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusNotFound)
+		defaultImage()
 		return
 	}
 
 	fileBytes, err := ioutil.ReadFile("files/images/" + image.Source)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusNotFound)
+		defaultImage()
 		return
 	}
 
@@ -213,7 +213,7 @@ func ShareImage(w http.ResponseWriter, r *middlewares.AuthorizedRequest) {
 	}
 
 	filename := uuid.New().String() + "_" + strconv.FormatInt(time.Now().UnixNano(), 10) + ".png"
-	err = copy("files/images/"+image.Source, filename)
+	err = copy("files/images/"+image.Source, "files/images/"+filename)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusNotFound)
 		return
@@ -224,8 +224,25 @@ func ShareImage(w http.ResponseWriter, r *middlewares.AuthorizedRequest) {
 		FolderId: folder.ID,
 		Type:     "avatar",
 		Main:     false,
+		BaseImage: entities.BaseImage{
+			Source: filename,
+		},
 	}
 	imageModule.Create(&sharedImage)
+
+	var userModule modules.UserModule
+	sharedUser, err := userModule.Find(data.UserId)
+	if err == nil {
+		go func() {
+			ws.NotificationsPool.Broadcast <- ws.Message{Body: map[string]interface{}{
+				"image": sharedImage,
+				"user":  r.User,
+				"type":  "share",
+			}, User: &sharedUser}
+		}()
+	} else {
+		fmt.Println(err)
+	}
 
 	utils.WriteJsonResponse(w, true)
 }

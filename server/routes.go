@@ -13,6 +13,7 @@ import (
 
 func initRoutes() http.Handler {
 	go ws.PrintsPool.Start()
+	go ws.NotificationsPool.Start()
 
 	r := mux.NewRouter()
 	s := r.PathPrefix("/api").Subrouter()
@@ -28,7 +29,6 @@ func initRoutes() http.Handler {
 	s.HandleFunc("/images", middlewares.Auth(controllers.SaveImage)).Methods("POST")
 	s.HandleFunc("/images", middlewares.Auth(controllers.GenerateImage)).Methods("PUT")
 	s.HandleFunc("/images/tags", middlewares.Auth(controllers.GetTags)).Methods("GET")
-	s.HandleFunc("/images/avatar", middlewares.Auth(controllers.GetAvatar)).Methods("GET")
 	s.HandleFunc("/images/folder/{id}", middlewares.Auth(controllers.GetFolderImages)).Methods("GET")
 	s.HandleFunc("/images/share", middlewares.Auth(controllers.ShareImage)).Methods("POST")
 	s.HandleFunc("/images/{id}/folder/{folderId}", middlewares.Auth(controllers.ImageToFolder)).Methods("PUT")
@@ -43,9 +43,12 @@ func initRoutes() http.Handler {
 	s.HandleFunc("/prints", middlewares.Auth(controllers.Clear)).Methods("DELETE")
 	s.HandleFunc("/prints/archive", middlewares.Auth(controllers.DownloadArchive)).Methods("GET")
 
+	s.HandleFunc("/folders/public", middlewares.Auth(controllers.GetPublic)).Methods("GET")
 	s.HandleFunc("/folders", middlewares.Auth(controllers.GetFolders)).Methods("GET")
 	s.HandleFunc("/folders", middlewares.Auth(controllers.CreateFolder)).Methods("POST")
 	s.HandleFunc("/folders/{id}", middlewares.Auth(controllers.DeleteFolder)).Methods("DELETE")
+	s.HandleFunc("/folders/{id}", middlewares.Auth(controllers.UpdateFolder)).Methods("PUT")
+	s.HandleFunc("/folders/{id}", middlewares.Auth(controllers.GetFolder)).Methods("GET")
 
 	s.HandleFunc("/admire-avatar/{emailHash}", controllers.GetImageByEmail).Methods("GET")
 
@@ -54,6 +57,9 @@ func initRoutes() http.Handler {
 
 	s.HandleFunc("/prints/channel", middlewares.Auth(func(w http.ResponseWriter, r *middlewares.AuthorizedRequest) {
 		ws.ServeWs(ws.PrintsPool, w, r)
+	}))
+	s.HandleFunc("/user/channel", middlewares.Auth(func(w http.ResponseWriter, r *middlewares.AuthorizedRequest) {
+		ws.ServeWs(ws.NotificationsPool, w, r)
 	}))
 
 	if os.Getenv("MODE") == "production" {

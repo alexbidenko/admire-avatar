@@ -31,9 +31,10 @@ import {UserType} from '~/types/user';
 import {SelectBaseOption} from 'naive-ui/es/select/src/interface';
 import md5 from 'md5';
 
-const {images, folders} = defineProps<{
+const {images, folders, hasAccess} = defineProps<{
   images: ImageType[];
   folders: FolderType[];
+  hasAccess: boolean;
 }>();
 
 // eslint-disable-next-line func-call-spacing
@@ -51,7 +52,7 @@ const showModal = ref(false);
 const showShare = ref(false);
 const users = ref<(UserType & {label: string; value: number})[]>([]);
 const selectedImage = ref<ImageType>();
-const selectedUser = ref<UserType>();
+const selectedUser = ref<number>();
 const directoryName = ref('');
 
 const deleteCurrentImage = (id: number) => {
@@ -97,31 +98,6 @@ const handleSelect = (key: number, image: ImageType) => {
   }).catch(loader.error).finally(loader.finish);
 };
 
-const shareImage = (image: ImageType) => {
-  showShare.value = true;
-  selectedImage.value = image;
-};
-
-const shareImageRequest = () => {
-  if (!selectedUser.value || !selectedImage.value || isRequestShare.value) return;
-  isRequestShare.value = true;
-  loader.start();
-  $axios.post('/images/share', {
-    userId: selectedUser.value.id,
-    imageId: selectedImage.value.id,
-  }).then(() => {
-    selectedUser.value = undefined;
-    showShare.value = false;
-    message.success('Сообщение успешно отправлено');
-  }).catch(() => {
-    message.error('Во время отправки изображения произошла ошибка');
-    loader.error();
-  }).finally(() => {
-    loader.finish();
-    isRequestShare.value = false;
-  });
-};
-
 const handleSearch = (query: string) => {
   isRequestUser.value = true;
   $axios.get<UserType[]>('users', {
@@ -139,7 +115,31 @@ const handleSearch = (query: string) => {
   });
 };
 
-handleSearch('');
+const shareImage = (image: ImageType) => {
+  handleSearch('');
+  showShare.value = true;
+  selectedImage.value = image;
+};
+
+const shareImageRequest = () => {
+  if (!selectedUser.value || !selectedImage.value || isRequestShare.value) return;
+  isRequestShare.value = true;
+  loader.start();
+  $axios.post('/images/share', {
+    userId: selectedUser.value,
+    imageId: selectedImage.value.id,
+  }).then(() => {
+    selectedUser.value = undefined;
+    showShare.value = false;
+    message.success('Сообщение успешно отправлено');
+  }).catch(() => {
+    message.error('Во время отправки изображения произошла ошибка');
+    loader.error();
+  }).finally(() => {
+    loader.finish();
+    isRequestShare.value = false;
+  });
+};
 
 const renderSingleSelectTag = (data: { option: SelectBaseOption<UserType> }) => (h as any)(
   'div',
@@ -200,7 +200,7 @@ const renderLabel = (option: UserType) => (h as any)(
 </script>
 
 <template>
-  <n-grid style="margin-top: 32px" v-if="images.length" cols="2 s:3 m:4 l:5 xl:6 2xl:8" responsive="screen" x-gap="16" y-gap="16">
+  <n-grid style="margin-top: 32px" v-if="images.length" cols="1 s:2 m:3 l:4 xl:5 2xl:6" responsive="screen" x-gap="16" y-gap="16">
     <n-grid-item
         v-for="image in images"
         :key="image.id"
@@ -212,7 +212,7 @@ const renderLabel = (option: UserType) => (h as any)(
               :src="`/api/files/images/${image.source}`"
           />
         </div>
-        <n-button-group class="mainPage__actions">
+        <n-button-group class="mainPage__actions" v-if="hasAccess">
           <a download="avatar.png" :href="`/api/files/images/${image.source}`">
             <n-button type="info">
               <n-icon>

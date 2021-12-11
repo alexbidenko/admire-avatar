@@ -1,14 +1,20 @@
 <script setup lang="ts">
-import {ref} from 'vue';
+import {computed, ref} from 'vue';
 import {
+  NBreadcrumb, NBreadcrumbItem,
+  NCard, NIcon,
   useLoadingBar,
 } from 'naive-ui';
 import {FolderType, ImageType} from '~/types/image';
 import $axios from '~/api';
-import {useRoute} from 'vue-router';
+import {useRoute, useRouter} from 'vue-router';
 import ImageList from '../components/ImageList.vue';
+import {FolderRegular} from '@vicons/fa';
+import {useMainStore} from '~/store';
 
+const store = useMainStore();
 const route = useRoute();
+const router = useRouter();
 const loader = useLoadingBar();
 
 const folders = ref<FolderType[]>([]);
@@ -27,11 +33,29 @@ Promise.all([
 const clearItem = (id: number) => {
   images.value = images.value.filter((el) => el.id !== id);
 };
+
+const currentFolder = computed(() => folders.value.find((el) => el.id === +route.params.folderId));
 </script>
 
 <template>
   <div class="container">
-    <ImageList :images="images" @clear-item="clearItem" :folders="folders" />
+    <n-card>
+      <n-breadcrumb>
+        <n-breadcrumb-item href="/" @click.prevent="router.push('/')">
+          <n-icon>
+            <folder-regular />
+          </n-icon>
+          Моя коллекция
+        </n-breadcrumb-item>
+        <n-breadcrumb-item>
+          <n-icon>
+            <folder-regular />
+          </n-icon>
+          {{ currentFolder?.name }}
+        </n-breadcrumb-item>
+      </n-breadcrumb>
+    </n-card>
+    <ImageList :images="images" @clear-item="clearItem" :folders="folders" :has-access="currentFolder?.userId === store.state.user.id" />
   </div>
 </template>
 
@@ -61,6 +85,17 @@ const clearItem = (id: number) => {
 }
 
 .mainPage__folder {
+  .n-card__content {
+    padding: 8px 8px 8px 16px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  p {
+    margin: 0;
+  }
+
   .n-button {
     opacity: 0;
     transition: opacity 0.3s ease, color .3s var(--bezier), background-color .3s var(--bezier), opacity .3s var(--bezier), border-color .3s var(--bezier);

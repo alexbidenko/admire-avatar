@@ -1,12 +1,23 @@
 <script setup lang="ts">
+import {h, onUnmounted} from 'vue';
 import {useRouter} from 'vue-router';
 import {useMainStore} from '~/store';
 import {logout, getUser} from '~/api/users';
 import {
-  NLayoutHeader, NButton, NSpace, NLayout, NButtonGroup, NScrollbar, NDropdown, NAvatar, NBackTop,
+  NLayoutHeader,
+  NButton,
+  NSpace,
+  NLayout,
+  NButtonGroup,
+  NScrollbar,
+  NDropdown,
+  NAvatar,
+  NBackTop,
+  useNotification,
+  NText,
 } from 'naive-ui';
 import {useRoute} from 'vue-router';
-import {getAvatar} from '~/api/images';
+import md5 from 'md5';
 
 const LINKS = [
   {
@@ -36,6 +47,7 @@ const OPTIONS = [
 const route = useRoute();
 const router = useRouter();
 const store = useMainStore();
+const notification = useNotification();
 
 const onSelectDropdownOption = (key: string) => {
   switch (key) {
@@ -55,8 +67,32 @@ getUser().then(({data}) => {
   store.commit('setUser', data);
 });
 
-getAvatar().then(({data}) => {
-  store.commit('setAvatar', data);
+const ws = new WebSocket(`${location.protocol === 'https' ? 'wss' : 'ws'}://${location.host}/api/user/channel`);
+
+ws.onmessage = (e: MessageEvent<string>) => {
+  const message = JSON.parse(e.data);
+  const n = notification.create({
+    title: 'С вами поделились изображением',
+    content: `Пользователь ${message.user.name} прислал вам изображение. Вы можете посмотреть его в соответствующей директории вашей колекции.`,
+    action: () => h(
+      NButton,
+      {
+        text: true,
+        type: 'primary',
+        onClick: () => {
+          router.push(`/folder/${message.image.folder_id}`);
+          n.destroy();
+        },
+      },
+      {
+        default: () => 'Перейти',
+      },
+    ),
+  });
+};
+
+onUnmounted(() => {
+  ws.close();
 });
 </script>
 
@@ -71,14 +107,14 @@ getAvatar().then(({data}) => {
         </n-button-group>
         <n-dropdown :options="OPTIONS" v-if="store.state.isAuthorized" :on-select="onSelectDropdownOption" placement="bottom-end">
           <n-button size="large" :bordered="false" style="padding-right: 0">
-            <span style="margin-right: 16px">
-            {{ store.state.user.name }}
-            </span>
+            <div style="margin-right: 16px; display: flex; flex-direction: column; align-items: end">
+              <n-text>{{ store.state.user.name }}</n-text>
+              <n-text :depth="3">{{ store.state.user.email }}</n-text>
+            </div>
             <n-avatar
-              v-if="store.state.avatar"
               round
               :size="48"
-              :src="`/api/files/images/${store.state.avatar?.source}`"
+              :src="`/api/admire-avatar/${md5(store.state.user.email)}`"
             />
           </n-button>
         </n-dropdown>

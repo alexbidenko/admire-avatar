@@ -30,7 +30,7 @@ func GeneratePrints(w http.ResponseWriter, r *middlewares.AuthorizedRequest) {
 	go func() {
 		for i := 1; i <= body.Count; i++ {
 			if i != 1 {
-				time.Sleep(time.Second)
+				time.Sleep(time.Millisecond * 800)
 			}
 			filename, err := utils.DownloadFile(body.GeneratedImage)
 			if err != nil {

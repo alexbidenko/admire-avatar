@@ -10,7 +10,7 @@ import (
 )
 
 type Message struct {
-	Body entities.Image     `json:"body"`
+	Body interface{}        `json:"body"`
 	User *entities.BaseUser `json:"-"`
 }
 
@@ -52,3 +52,4 @@ func ServeWs(pool *Pool, w http.ResponseWriter, r *middlewares.AuthorizedRequest
 }
 
 var PrintsPool = NewPool()
+var NotificationsPool = NewPool()
