@@ -7,11 +7,11 @@ import {
   NImage,
   NH3,
   NGrid,
-  NGridItem,
+  NGridItem, NIcon,
 } from 'naive-ui';
 import {getImages, deleteImage, createAvatar} from '~/api/images';
 import {ImageType} from '~/types/image';
-import {TrashAlt} from '@vicons/fa';
+import {Download as DownloadRegular, SaveRegular, TrashAlt} from '@vicons/fa';
 
 const images = ref<ImageType[]>([]);
 
@@ -20,10 +20,12 @@ getImages().then(({data}) => {
 });
 
 const deleteCurrentImage = (id: number) => {
-  deleteImage(id);
+  deleteImage(id).then(() => {
+    images.value = images.value.filter((el) => el.id !== id);
+  });
 };
 
-const selectedAvatar = (image: ImageType) => {
+const selectAvatar = (image: ImageType) => {
   createAvatar(image.id).then(() => {
     image.main = true;
   });
@@ -43,10 +45,25 @@ const selectedAvatar = (image: ImageType) => {
               :class="{'selected': image.main}"
               :src="`/api/files/images/${image.source}`"
           />
-          <trash-alt @click="deleteCurrentImage(image.id)" class="close"/>
-          <a download="avatar.png" :href="`/api/files/images/${image.source}`">
-            <n-button type="success">Скачать</n-button>
-          </a>
+          <n-button-group>
+            <a download="avatar.png" :href="`/api/files/images/${image.source}`">
+              <n-button type="info">
+                <n-icon>
+                  <download-regular />
+                </n-icon>
+              </n-button>
+            </a>
+            <n-button type="success" @click="selectAvatar(image)">
+              <n-icon>
+                <save-regular />
+              </n-icon>
+            </n-button>
+            <n-button type="error" @click="deleteCurrentImage(image.id)">
+              <n-icon>
+                <trash-alt />
+              </n-icon>
+            </n-button>
+          </n-button-group>
         </n-grid-item>
       </n-grid>
     </n-card>
