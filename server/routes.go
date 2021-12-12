@@ -74,8 +74,12 @@ func initRoutes() http.Handler {
 				t := template.New("index.html")
 				parser, _ := t.ParseFiles("dist/index.html")
 
+				ogImage := "https://picart.admire.social/android-chrome-512x512.png"
+				if strings.HasPrefix(r.URL.Path, "/images/") {
+					ogImage = "https://picart.admire.social/api" + r.URL.Path
+				}
 				err = parser.Execute(w, map[string]string{
-					"og_image": "https://picart.admire.social/api" + r.URL.Path + "/data",
+					"og_image": ogImage,
 				})
 				if err != nil {
 					http.Error(w, err.Error(), http.StatusInternalServerError)
