@@ -138,7 +138,7 @@ const opacity = computed(() => Math.max(0, (200 - Math.abs(xRotate.value) * 2) /
         </n-icon>
       </n-button>
       <n-input @keydown.enter="nextImage" v-model:value="search" type="text" placeholder="Введите фразу" style="width: 220px" />
-      <n-button @click="likeImage" strong secondary circle>
+      <n-button @click="likeImage" strong secondary circle :disabled="isRequest">
         <n-icon>
           <save-regular />
         </n-icon>
@@ -158,8 +158,13 @@ const opacity = computed(() => Math.max(0, (200 - Math.abs(xRotate.value) * 2) /
     margin: 0 auto;
   }
 
-  &__image img {
-    object-fit: cover;
+  &__image {
+    pointer-events: all;
+
+    img {
+      pointer-events: none;
+      object-fit: cover;
+    }
   }
 
   &__icon {
