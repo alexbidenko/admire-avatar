@@ -30,6 +30,7 @@ import $axios from '~/api';
 import {UserType} from '~/types/user';
 import {SelectBaseOption} from 'naive-ui/es/select/src/interface';
 import md5 from 'md5';
+import {useRoute} from 'vue-router';
 
 const {images, folders, hasAccess} = defineProps<{
   images: ImageType[];
@@ -42,6 +43,7 @@ const emit = defineEmits<{
   (event: 'clear-item', value: number): void
 }>();
 
+const route = useRoute();
 const message = useMessage();
 const loader = useLoadingBar();
 const store = useMainStore();
@@ -79,17 +81,21 @@ const cancel = () => {
   selectedUser.value = undefined;
 };
 
-const options = computed(() => [
-  {
-    label: 'Переместить в директорию',
-    key: 'title',
-    disabled: true,
-  },
-  ...folders.map((el) => ({
+const options = computed(() => {
+  const arr = (folders.filter((el) => el.id !== +route.params.folderId) as any).map((el: any) => ({
     label: el.name,
     key: el.id,
-  })),
-]);
+  }));
+  if (!!+route.params.folderId) arr.unshift({label: 'Моя коллекция', key: 0});
+  return [
+    {
+      label: 'Переместить в директорию',
+      key: 'title',
+      disabled: true,
+    },
+    ...arr,
+  ];
+});
 
 const handleSelect = (key: number, image: ImageType) => {
   loader.start();
