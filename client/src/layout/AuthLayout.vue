@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import {h, onUnmounted} from 'vue';
+import {h, onUnmounted, ref} from 'vue';
 import {useRouter} from 'vue-router';
 import {useMainStore} from '~/store';
 import {logout, getUser} from '~/api/users';
@@ -14,10 +14,14 @@ import {
   NAvatar,
   NBackTop,
   useNotification,
-  NText,
+  NText, NDrawer, NDrawerContent, NIcon, NMenu,
 } from 'naive-ui';
 import {useRoute} from 'vue-router';
 import md5 from 'md5';
+import {Bars as BarsRegular} from '@vicons/fa';
+
+const screenWidth = ref(0);
+const showMenu = ref(false);
 
 const LINKS = [
   {
@@ -92,35 +96,72 @@ ws.onmessage = (e: MessageEvent<string>) => {
   });
 };
 
+const navigate = (_: string, item: { to: string }) => {
+  router.push(item.to);
+  showMenu.value = false;
+};
+
+const onResize = () => {
+  screenWidth.value = window.innerWidth;
+};
+window.addEventListener('resize', onResize);
 onUnmounted(() => {
   ws.close();
+  window.removeEventListener('resize', onResize);
 });
+onResize();
 </script>
 
 <template>
   <n-layout class="authorizedLayout">
     <n-layout-header position="absolute" bordered>
       <n-space justify="space-between" align="center">
-        <n-button-group>
+        <n-button quaternary @click="showMenu = !showMenu" v-if="screenWidth < 640" size="large">
+          <n-icon>
+            <bars-regular />
+          </n-icon>
+        </n-button>
+        <n-button-group v-if="screenWidth >= 640">
           <router-link v-for="link in LINKS" :to="link.to" :key="link.key" v-slot="{ isExactActive }">
             <n-button :bordered="false" :tertiary="isExactActive || (link.key === 'main' && route.fullPath.includes('/generate'))">{{ link.label }}</n-button>
           </router-link>
         </n-button-group>
-        <n-dropdown :options="OPTIONS" v-if="store.state.isAuthorized" :on-select="onSelectDropdownOption" placement="bottom-end">
+        <n-dropdown :options="OPTIONS" v-if="store.state.isAuthorized && screenWidth >= 640" :on-select="onSelectDropdownOption" placement="bottom-end">
           <n-button size="large" :bordered="false" style="padding-right: 0">
             <div style="margin-right: 16px; display: flex; flex-direction: column; align-items: end">
               <n-text style="margin-bottom: 4px">{{ store.state.user.name }}</n-text>
               <n-text :depth="3">{{ store.state.user.email }}</n-text>
             </div>
             <n-avatar
-              round
-              :size="48"
-              :src="`/api/admire-avatar/${md5(store.state.user.email)}?key=${store.state.avatar}`"
+                round
+                :size="48"
+                :src="`/api/admire-avatar/${md5(store.state.user.email)}?key=${store.state.avatar}`"
             />
           </n-button>
         </n-dropdown>
       </n-space>
     </n-layout-header>
+
+    <n-drawer v-model:show="showMenu" :width="320" placement="left">
+      <n-drawer-content title="Stoner" body-content-style="padding-left: 0; padding-right: 0">
+        <template #header>
+          <div style="padding: 8px 0">
+            <n-avatar
+                round
+                :size="80"
+                :src="`/api/admire-avatar/${md5(store.state.user.email)}?key=${store.state.avatar}`"
+            />
+            <n-text style="margin-bottom: 8px; margin-top: 24px; width: 100%; display: block">{{ store.state.user.name }}</n-text>
+            <n-text :depth="3">{{ store.state.user.email }}</n-text>
+          </div>
+        </template>
+        <n-menu
+            :on-update:value="navigate"
+            :options="LINKS"
+        />
+      </n-drawer-content>
+    </n-drawer>
+
     <n-scrollbar class="authorizedLayout__scrollbar scrollContainer">
       <router-view v-slot="{ Component }">
         <transition name="scale" mode="out-in">

@@ -1,15 +1,15 @@
 <script setup lang="ts">
 import {computed, ref} from 'vue';
 import {
-  NBreadcrumb, NBreadcrumbItem,
-  NCard, NIcon,
+  NBreadcrumb, NBreadcrumbItem, NButton,
+  NCard, NIcon, NSpace,
   useLoadingBar,
 } from 'naive-ui';
 import {FolderType, ImageType} from '~/types/image';
 import $axios from '~/api';
 import {useRoute, useRouter} from 'vue-router';
 import ImageList from '../components/ImageList.vue';
-import {FolderRegular} from '@vicons/fa';
+import {FolderRegular, Download as DownloadRegular} from '@vicons/fa';
 import {useMainStore} from '~/store';
 
 const store = useMainStore();
@@ -40,20 +40,29 @@ const currentFolder = computed(() => folders.value.find((el) => el.id === +route
 <template>
   <div class="container">
     <n-card>
-      <n-breadcrumb>
-        <n-breadcrumb-item href="/" @click.prevent="router.push('/')">
-          <n-icon>
-            <folder-regular />
-          </n-icon>
-          Моя коллекция
-        </n-breadcrumb-item>
-        <n-breadcrumb-item>
-          <n-icon>
-            <folder-regular />
-          </n-icon>
-          {{ currentFolder?.name }}
-        </n-breadcrumb-item>
-      </n-breadcrumb>
+      <n-space justify="space-between" align="center">
+        <n-breadcrumb>
+          <n-breadcrumb-item href="/" @click.prevent="router.push('/')">
+            <n-icon>
+              <folder-regular />
+            </n-icon>
+            Моя коллекция
+          </n-breadcrumb-item>
+          <n-breadcrumb-item>
+            <n-icon>
+              <folder-regular />
+            </n-icon>
+            {{ currentFolder?.name }}
+          </n-breadcrumb-item>
+        </n-breadcrumb>
+        <a :download="`folder-${currentFolder?.id}.zip`" :href="`/api/images/folder/${currentFolder?.id}/archive`">
+          <n-button type="info">
+            <n-icon>
+              <download-regular />
+            </n-icon>
+          </n-button>
+        </a>
+      </n-space>
     </n-card>
     <ImageList :images="images" @clear-item="clearItem" :folders="folders" :key="folders.length" :has-access="currentFolder?.userId === store.state.user.id" />
   </div>

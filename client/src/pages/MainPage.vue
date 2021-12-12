@@ -19,7 +19,10 @@ import {getImages} from '~/api/images';
 import {FolderType, ImageType} from '~/types/image';
 import {
   TrashAlt,
-  FolderPlus, EditRegular, EyeRegular,
+  FolderPlus,
+  EditRegular,
+  EyeRegular,
+  Download as DownloadRegular,
 } from '@vicons/fa';
 import $axios from '~/api';
 import {UserType} from '~/types/user';
@@ -184,13 +187,22 @@ const clearItem = (id: number) => {
     <n-card>
       <n-space justify="space-between">
         <router-link to="/generate">
-          <n-button type="warning">Подобрать</n-button>
+          <n-button type="success">Подобрать изображения</n-button>
         </router-link>
-        <n-button type="success" @click="toCreateDirectory">
-          <n-icon>
-            <folder-plus />
-          </n-icon>
-        </n-button>
+        <n-button-group>
+          <a download="library.zip" href="/api/images/folder/0/archive">
+            <n-button type="info">
+              <n-icon>
+                <download-regular />
+              </n-icon>
+            </n-button>
+          </a>
+          <n-button type="success" @click="toCreateDirectory">
+            <n-icon>
+              <folder-plus />
+            </n-icon>
+          </n-button>
+        </n-button-group>
       </n-space>
     </n-card>
     <n-card style="margin-top: 32px" v-if="!images.length && !folders.length">Добавьте первое изображение</n-card>

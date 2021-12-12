@@ -78,7 +78,7 @@ func ChangePassword(w http.ResponseWriter, r *middlewares.AuthorizedRequest) {
 		return
 	}
 
-	data, err := userModule.GetByEmail(r.User.Email)
+	data, err := userModule.Find(r.User.ID)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusNotFound)
 		return
@@ -86,7 +86,7 @@ func ChangePassword(w http.ResponseWriter, r *middlewares.AuthorizedRequest) {
 	data.Password = string(bytes)
 	userModule.Update(data.ID, &data)
 
-	utils.WriteJsonResponse(w, nil)
+	utils.WriteJsonResponse(w, true)
 }
 
 func Refresh(w http.ResponseWriter, r *http.Request) {
@@ -219,5 +219,5 @@ func GetUserByToken(w http.ResponseWriter, r *middlewares.AuthorizedRequest) {
 		return
 	}
 
-	utils.WriteJsonResponse(w, user)
+	utils.WriteJsonResponse(w, user.BaseUser)
 }

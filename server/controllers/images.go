@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"admire-avatar/config"
 	"admire-avatar/entities"
 	"admire-avatar/middlewares"
 	"admire-avatar/modules"
@@ -238,7 +239,7 @@ func ShareImage(w http.ResponseWriter, r *middlewares.AuthorizedRequest) {
 				"image": sharedImage,
 				"user":  r.User,
 				"type":  "share",
-			}, User: &sharedUser}
+			}, User: &sharedUser.BaseUser}
 		}()
 	} else {
 		fmt.Println(err)
@@ -247,8 +248,12 @@ func ShareImage(w http.ResponseWriter, r *middlewares.AuthorizedRequest) {
 	utils.WriteJsonResponse(w, true)
 }
 
+func DownloadFolder(w http.ResponseWriter, r *middlewares.AuthorizedRequest) {
+	downloadFolder(w, r, mux.Vars(r.Request)["id"])
+}
+
 func GetTags(w http.ResponseWriter, _ *middlewares.AuthorizedRequest) {
-	resp, err := http.Get("http://192.168.43.7:8000/images/tags")
+	resp, err := http.Get(config.ServerApi + "/images/tags")
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}

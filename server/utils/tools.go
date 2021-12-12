@@ -1,6 +1,7 @@
 package utils
 
 import (
+	"admire-avatar/config"
 	"admire-avatar/entities"
 	"bytes"
 	"encoding/json"
@@ -41,7 +42,7 @@ type GeneratedImage struct {
 func DownloadFile(data GeneratedImage) (string, error) {
 	body, err := json.Marshal(data)
 
-	resp, err := http.Post("http://192.168.43.7:8000/images/", "application/json", bytes.NewBuffer(body))
+	resp, err := http.Post(config.ServerApi+"/images/", "application/json", bytes.NewBuffer(body))
 	if err == nil && resp.StatusCode == 404 {
 		fmt.Println("Image not found")
 		return "", err

@@ -30,6 +30,7 @@ func initRoutes() http.Handler {
 	s.HandleFunc("/images", middlewares.Auth(controllers.GenerateImage)).Methods("PUT")
 	s.HandleFunc("/images/tags", middlewares.Auth(controllers.GetTags)).Methods("GET")
 	s.HandleFunc("/images/folder/{id}", middlewares.Auth(controllers.GetFolderImages)).Methods("GET")
+	s.HandleFunc("/images/folder/{id}/archive", middlewares.Auth(controllers.DownloadFolder)).Methods("GET")
 	s.HandleFunc("/images/share", middlewares.Auth(controllers.ShareImage)).Methods("POST")
 	s.HandleFunc("/images/{id}/folder/{folderId}", middlewares.Auth(controllers.ImageToFolder)).Methods("PUT")
 	s.HandleFunc("/images/{id}", middlewares.Auth(controllers.RemoveImage)).Methods("DELETE")

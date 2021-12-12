@@ -105,10 +105,7 @@ func Clear(w http.ResponseWriter, r *middlewares.AuthorizedRequest) {
 	utils.WriteJsonResponse(w, true)
 }
 
-type DownloadArchiveBody struct {
-}
-
-func DownloadArchive(w http.ResponseWriter, r *middlewares.AuthorizedRequest) {
+func downloadFolder(w http.ResponseWriter, r *middlewares.AuthorizedRequest, folderID string) {
 	generateFileId := uuid.New().String()
 	archive, err := os.Create("files/temporary/" + generateFileId + ".zip")
 	if err != nil {
@@ -119,7 +116,12 @@ func DownloadArchive(w http.ResponseWriter, r *middlewares.AuthorizedRequest) {
 	zipWriter := zip.NewWriter(archive)
 
 	var imagesModule modules.ImageModule
-	images := imagesModule.Get(r.User.ID, "print")
+	var images []entities.Image
+	if folderID == "-1" {
+		images = imagesModule.Get(r.User.ID, "print")
+	} else {
+		images = imagesModule.GetByFolder(folderID, "avatar")
+	}
 	for _, image := range images {
 		f1, err := os.Open("files/images/" + image.Source)
 		if err == nil {
@@ -139,4 +141,8 @@ func DownloadArchive(w http.ResponseWriter, r *middlewares.AuthorizedRequest) {
 	zipWriter.Close()
 
 	http.ServeFile(w, r.Request, "files/temporary/"+generateFileId+".zip")
+}
+
+func DownloadArchive(w http.ResponseWriter, r *middlewares.AuthorizedRequest) {
+	downloadFolder(w, r, "-1")
 }
