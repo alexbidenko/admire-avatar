@@ -43,13 +43,13 @@ func DownloadFile(data GeneratedImage) (string, error) {
 	body, err := json.Marshal(data)
 
 	resp, err := http.Post(config.ServerApi+"/images/", "application/json", bytes.NewBuffer(body))
-	if err == nil && resp.StatusCode == 404 {
-		fmt.Println("Image not found")
-		return "", err
-	}
 	if err != nil {
 		fmt.Println(err)
 		return "", err
+	}
+	if resp.StatusCode != 200 {
+		fmt.Println(resp.Status)
+		return "", errors.New(resp.Status)
 	}
 
 	defer func() {

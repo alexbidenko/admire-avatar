@@ -13,6 +13,7 @@ import (
 	"io"
 	"net/http"
 	"os"
+	"time"
 )
 
 type GenerateRequestBody struct {
@@ -27,12 +28,15 @@ func GeneratePrints(w http.ResponseWriter, r *middlewares.AuthorizedRequest) {
 	var body GenerateRequestBody
 	utils.ParseRequestBody(w, r.Request, &body)
 
-	if _, ok := Orders[r.User.ID]; !ok {
-		Orders[r.User.ID] = 0
-	}
-	Orders[r.User.ID] = Orders[r.User.ID] + body.Count
-	for i := 1; i <= body.Count; i++ {
-		go func() {
+	go func() {
+		if _, ok := Orders[r.User.ID]; !ok {
+			Orders[r.User.ID] = 0
+		}
+		Orders[r.User.ID] = Orders[r.User.ID] + body.Count
+		for i := 1; i <= body.Count; i++ {
+			if i != 1 {
+				time.Sleep(time.Millisecond * 800)
+			}
 			filename, err := utils.DownloadFile(body.GeneratedImage)
 			Orders[r.User.ID] = Orders[r.User.ID] - 1
 			if err != nil {
@@ -55,8 +59,8 @@ func GeneratePrints(w http.ResponseWriter, r *middlewares.AuthorizedRequest) {
 
 				ws.PrintsPool.Broadcast <- ws.Message{Body: image, User: &r.User}
 			}
-		}()
-	}
+		}
+	}()
 
 	utils.WriteJsonResponse(w, true)
 }
