@@ -27,11 +27,16 @@ const count = ref(1);
 const tag = ref<string>();
 const tags = ref<{ value: string; label: string }[]>([]);
 const images = ref<ImageType[]>([]);
+const generateCount = ref(0);
 
 const ws = new WebSocket(`${location.protocol === 'https' ? 'wss' : 'ws'}://${location.host}/api/prints/channel`);
 
 ws.onmessage = (e: MessageEvent<string>) => {
-  images.value.unshift(JSON.parse(e.data));
+  const image = JSON.parse(e.data);
+  generateCount.value -= 1;
+  console.log(image);
+  if (image) images.value.unshift(image);
+  else message.error('Во время генерации одного из изобращений произошла ошибка.');
 };
 
 onUnmounted(() => {
@@ -44,9 +49,16 @@ Promise.all([
     tags.value = data;
   }),
   getPrints().then(({data}) => {
-    images.value = data;
+    images.value = data.images;
+    generateCount.value = data.generate;
   }),
 ]).catch(loader.error).finally(loader.finish);
+
+const wordForms = (count: number, words: string[]) => {
+  if (count % 10 === 1) return words[0];
+  if (count % 10 > 1 && count % 10 < 5) return words[1];
+  return words[2];
+};
 
 const generate = () => {
   loader.start();
@@ -55,6 +67,7 @@ const generate = () => {
     phrase: phrase.value,
     tags: tag.value ? [tag.value] : [],
   }).then(() => {
+    generateCount.value += count.value;
     message.info('Генерация принтов запущена');
   }).catch(() => {
     loader.error();
@@ -104,6 +117,16 @@ const deleteAll = () => {
           </n-button>
         </a>
       </n-button-group>
+    </n-card>
+
+    <n-card v-if="!generateCount && !images.length">
+      Введите поисковую фразу и выберите стиль и количество изображений. Мы создадим для вас уникальный контент!
+      Генерация происходит в фоновом режиме и вы можете не ограничивать себя в изучении нашего приложения.
+    </n-card>
+
+    <n-card v-else-if="generateCount" style="margin-bottom: 24px">
+      В процессе генерации {{ generateCount }} {{ wordForms(generateCount, ['изображение', 'изображения', 'изображений']) }}.
+      Вы увидите их на этой странице через некоторое время, а пока можете изучить публичный контент других пользователей.
     </n-card>
 
     <n-grid cols="2 s:3 m:4 l:5 xl:6 2xl:8" responsive="screen" x-gap="16" y-gap="16">

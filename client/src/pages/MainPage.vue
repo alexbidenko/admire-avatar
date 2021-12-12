@@ -184,7 +184,7 @@ const clearItem = (id: number) => {
     <n-card>
       <n-space justify="space-between">
         <router-link to="/generate">
-          <n-button type="warning">Сгенерировать</n-button>
+          <n-button type="warning">Подобрать</n-button>
         </router-link>
         <n-button type="success" @click="toCreateDirectory">
           <n-icon>
@@ -256,11 +256,6 @@ const clearItem = (id: number) => {
   cursor: pointer;
 }
 
-.selected {
-  border: 4px solid red;
-  border-radius: 5px;
-}
-
 .n-image > img {
   width: 100%;
   cursor: pointer;
@@ -280,16 +275,6 @@ const clearItem = (id: number) => {
 
     &:hover .n-button {
       opacity: 1;
-    }
-  }
-
-  &__actions {
-    padding-bottom: 10px;
-    width: 100%;
-    justify-content: center;
-
-    .n-button {
-      width: 34px;
     }
   }
 }

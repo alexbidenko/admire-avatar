@@ -46,6 +46,10 @@ func DownloadFile(data GeneratedImage) (string, error) {
 		fmt.Println("Image not found")
 		return "", err
 	}
+	if err != nil {
+		fmt.Println(err)
+		return "", err
+	}
 
 	defer func() {
 		err = resp.Body.Close()

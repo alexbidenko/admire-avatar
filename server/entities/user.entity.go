@@ -26,7 +26,7 @@ type User struct {
 
 func (u *User) GenerateAccessToken() (string, error) {
 	var ctx = context.Background()
-	expiresAt := time.Now().Add(time.Hour)
+	expiresAt := time.Now().Add(time.Hour * 24)
 	claims := UserClaims{
 		Uuid:       uuid.New().String(),
 		Authorized: true,

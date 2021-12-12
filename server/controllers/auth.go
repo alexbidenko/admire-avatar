@@ -191,7 +191,7 @@ func writeTokens(w http.ResponseWriter, user *entities.User) {
 		Path:     "/",
 		Secure:   os.Getenv("MODE") != "production",
 		HttpOnly: true,
-		Expires:  time.Now().Add(time.Hour),
+		Expires:  time.Now().Add(time.Hour * 24),
 	})
 	http.SetCookie(w, &http.Cookie{
 		Name:     "refresh_token",

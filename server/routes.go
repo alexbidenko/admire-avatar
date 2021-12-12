@@ -37,7 +37,7 @@ func initRoutes() http.Handler {
 	s.HandleFunc("/images/{id}", middlewares.Auth(controllers.GetImage)).Methods("GET")
 	s.HandleFunc("/images/{offset}/{limit}", middlewares.Auth(controllers.GetPaginatedImages)).Methods("GET")
 
-	s.HandleFunc("/prints/{offset}/{limit}", middlewares.Auth(controllers.GetPaginatedPrints)).Methods("GET")
+	s.HandleFunc("/prints", middlewares.Auth(controllers.GetPrints)).Methods("GET")
 	s.HandleFunc("/prints", middlewares.Auth(controllers.GeneratePrints)).Methods("POST")
 	s.HandleFunc("/prints/{id}", middlewares.Auth(controllers.PrintToAvatar)).Methods("PUT")
 	s.HandleFunc("/prints", middlewares.Auth(controllers.Clear)).Methods("DELETE")

@@ -13,7 +13,6 @@ import (
 	"io"
 	"net/http"
 	"os"
-	"strconv"
 	"time"
 )
 
@@ -22,12 +21,18 @@ type GenerateRequestBody struct {
 	Count int `json:"count"`
 }
 
+var Orders = make(map[uint]int)
+
 func GeneratePrints(w http.ResponseWriter, r *middlewares.AuthorizedRequest) {
 	var imageModule modules.ImageModule
 	var body GenerateRequestBody
 	utils.ParseRequestBody(w, r.Request, &body)
 
 	go func() {
+		if _, ok := Orders[r.User.ID]; !ok {
+			Orders[r.User.ID] = 0
+		}
+		Orders[r.User.ID] = Orders[r.User.ID] + body.Count
 		for i := 1; i <= body.Count; i++ {
 			if i != 1 {
 				time.Sleep(time.Millisecond * 800)
@@ -35,6 +40,7 @@ func GeneratePrints(w http.ResponseWriter, r *middlewares.AuthorizedRequest) {
 			filename, err := utils.DownloadFile(body.GeneratedImage)
 			if err != nil {
 				fmt.Println(err)
+				ws.PrintsPool.Broadcast <- ws.Message{Body: nil, User: &r.User}
 			} else {
 				image := entities.Image{
 					BaseImage: entities.BaseImage{
@@ -52,28 +58,22 @@ func GeneratePrints(w http.ResponseWriter, r *middlewares.AuthorizedRequest) {
 
 				ws.PrintsPool.Broadcast <- ws.Message{Body: image, User: &r.User}
 			}
+			Orders[r.User.ID] = Orders[r.User.ID] - 1
 		}
 	}()
 
 	utils.WriteJsonResponse(w, true)
 }
 
-func GetPaginatedPrints(w http.ResponseWriter, r *middlewares.AuthorizedRequest) {
+func GetPrints(w http.ResponseWriter, r *middlewares.AuthorizedRequest) {
 	var imageModule modules.ImageModule
-	offset, err := strconv.Atoi(mux.Vars(r.Request)["offset"])
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
-		return
-	}
-	limit, err := strconv.Atoi(mux.Vars(r.Request)["limit"])
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
-		return
-	}
 
-	images := imageModule.Paginate(r.User.ID, "print", offset, limit)
+	images := imageModule.Get(r.User.ID, "print")
 
-	utils.WriteJsonResponse(w, images)
+	utils.WriteJsonResponse(w, map[string]interface{}{
+		"images":   images,
+		"generate": Orders[r.User.ID],
+	})
 }
 
 func PrintToAvatar(w http.ResponseWriter, r *middlewares.AuthorizedRequest) {

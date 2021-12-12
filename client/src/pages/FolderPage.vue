@@ -55,7 +55,7 @@ const currentFolder = computed(() => folders.value.find((el) => el.id === +route
         </n-breadcrumb-item>
       </n-breadcrumb>
     </n-card>
-    <ImageList :images="images" @clear-item="clearItem" :folders="folders" :has-access="currentFolder?.userId === store.state.user.id" />
+    <ImageList :images="images" @clear-item="clearItem" :folders="folders" :key="folders.length" :has-access="currentFolder?.userId === store.state.user.id" />
   </div>
 </template>
 
@@ -72,11 +72,6 @@ const currentFolder = computed(() => folders.value.find((el) => el.id === +route
   right: 0;
   width: 20%;
   cursor: pointer;
-}
-
-.selected {
-  border: 4px solid red;
-  border-radius: 5px;
 }
 
 .n-image > img {

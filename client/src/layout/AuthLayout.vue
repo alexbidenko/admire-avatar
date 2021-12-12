@@ -65,6 +65,7 @@ const onSelectDropdownOption = (key: string) => {
 
 getUser().then(({data}) => {
   store.commit('setUser', data);
+  store.commit('setAvatar', store.state.avatar + 1);
 });
 
 const ws = new WebSocket(`${location.protocol === 'https' ? 'wss' : 'ws'}://${location.host}/api/user/channel`);
@@ -108,13 +109,13 @@ onUnmounted(() => {
         <n-dropdown :options="OPTIONS" v-if="store.state.isAuthorized" :on-select="onSelectDropdownOption" placement="bottom-end">
           <n-button size="large" :bordered="false" style="padding-right: 0">
             <div style="margin-right: 16px; display: flex; flex-direction: column; align-items: end">
-              <n-text>{{ store.state.user.name }}</n-text>
+              <n-text style="margin-bottom: 4px">{{ store.state.user.name }}</n-text>
               <n-text :depth="3">{{ store.state.user.email }}</n-text>
             </div>
             <n-avatar
               round
               :size="48"
-              :src="`/api/admire-avatar/${md5(store.state.user.email)}`"
+              :src="`/api/admire-avatar/${md5(store.state.user.email)}?key=${store.state.avatar}`"
             />
           </n-button>
         </n-dropdown>

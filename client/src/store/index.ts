@@ -5,17 +5,17 @@ import {UserType} from '~/types/user';
 type MainState = {
   user: UserType,
   isAuthorized: boolean,
+  avatar: number;
 }
 
 export const key: InjectionKey<Store<MainState>> = Symbol();
 
 export default createStore<MainState>({
-  state: () => {
-    return {
-      user: {} as UserType,
-      isAuthorized: false,
-    };
-  },
+  state: () => ({
+    user: {} as UserType,
+    isAuthorized: false,
+    avatar: 1,
+  }),
   mutations: {
     setUser: (state, value: UserType) => {
       state.user = value;
@@ -24,6 +24,9 @@ export default createStore<MainState>({
     logout: (state) => {
       state.user = {} as UserType;
       state.isAuthorized = false;
+    },
+    setAvatar: (state, value: number) => {
+      state.avatar = value;
     },
   },
 });

@@ -68,7 +68,7 @@ const selectAvatar = (image: ImageType) => {
       el.main = false;
     });
     image.main = true;
-    store.commit('setAvatar', image);
+    store.commit('setAvatar', store.state.avatar + 1);
   });
 };
 
@@ -208,28 +208,29 @@ const renderLabel = (option: UserType) => (h as any)(
       <n-card content-style="padding: 0">
         <div class="squareImageCard">
           <n-image
-              :class="{'selected': image.main}"
+              class="imageList__image"
+              :class="{'imageList__image_selected': image.main}"
               :src="`/api/files/images/${image.source}`"
           />
         </div>
-        <n-button-group class="mainPage__actions" v-if="hasAccess">
-          <a download="avatar.png" :href="`/api/files/images/${image.source}`">
+        <n-button-group class="imageList__actions" v-if="hasAccess">
+          <n-button type="info" @click="shareImage(image)">
+            <n-icon>
+              <share-alt />
+            </n-icon>
+          </n-button>
+          <n-button type="success" @click="selectAvatar(image)">
+            <n-icon>
+              <user-circle />
+            </n-icon>
+          </n-button>
+          <a :download="image.source" :href="`/api/files/images/${image.source}`">
             <n-button type="info">
               <n-icon>
                 <download-regular />
               </n-icon>
             </n-button>
           </a>
-          <n-button type="success" @click="selectAvatar(image)">
-            <n-icon>
-              <user-circle />
-            </n-icon>
-          </n-button>
-          <n-button type="error" @click="deleteCurrentImage(image.id)">
-            <n-icon>
-              <trash-alt />
-            </n-icon>
-          </n-button>
           <n-dropdown trigger="hover" @select="handleSelect($event, image)" :options="options">
             <n-button>
               <n-icon>
@@ -237,9 +238,9 @@ const renderLabel = (option: UserType) => (h as any)(
               </n-icon>
             </n-button>
           </n-dropdown>
-          <n-button type="info" @click="shareImage(image)">
+          <n-button type="error" @click="deleteCurrentImage(image.id)">
             <n-icon>
-              <share-alt />
+              <trash-alt />
             </n-icon>
           </n-button>
         </n-button-group>
@@ -290,25 +291,39 @@ const renderLabel = (option: UserType) => (h as any)(
   cursor: pointer;
 }
 
-.selected {
-  border: 4px solid red;
-  border-radius: 5px;
-  box-sizing: border-box;
-}
-
 .n-image > img {
   width: 100%;
   cursor: pointer;
 }
 
-.images {
+.imageList {
   &__actions {
     padding-bottom: 10px;
     width: 100%;
     justify-content: center;
+  }
 
-    .n-button {
-      width: 34px;
+  &__image {
+    position: relative;
+
+    &::after {
+      content: "";
+      border: 4px solid #63e2b7;
+      border-radius: 5px;
+      box-sizing: border-box;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s ease;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      display: block;
+      position: absolute;
+    }
+
+    &_selected::after {
+      opacity: 1;
     }
   }
 }
