@@ -131,7 +131,7 @@ func GetImageFile(w http.ResponseWriter, r *middlewares.AuthorizedRequest) {
 	var imageModule modules.ImageModule
 	id := mux.Vars(r.Request)["id"]
 
-	image, err := imageModule.Find(r.User.ID, id)
+	image, err := imageModule.Find(r.User.ID, strings.ReplaceAll(id, ".png", ""))
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusNotFound)
 		return

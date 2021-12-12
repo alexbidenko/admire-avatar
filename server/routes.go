@@ -76,7 +76,7 @@ func initRoutes() http.Handler {
 
 				ogImage := "https://picart.admire.social/android-chrome-512x512.png"
 				if strings.HasPrefix(r.URL.Path, "/images/") {
-					ogImage = "https://picart.admire.social/api" + r.URL.Path
+					ogImage = "https://picart.admire.social/api" + r.URL.Path + ".png"
 				}
 				err = parser.Execute(w, map[string]string{
 					"og_image": ogImage,
