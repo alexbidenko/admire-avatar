@@ -34,9 +34,9 @@ const ws = new WebSocket(`${location.protocol === 'https:' ? 'wss' : 'ws'}://${l
 ws.onmessage = (e: MessageEvent<string>) => {
   const image = JSON.parse(e.data);
   generateCount.value -= 1;
-  console.log(image);
-  if (image) images.value.unshift(image);
-  else message.error('Во время генерации одного из изобращений произошла ошибка.');
+  if (image) {
+    if (!images.value.find((el) => el.id === image.id)) images.value.unshift(image);
+  } else message.error('Во время генерации одного из изобращений произошла ошибка.');
 };
 
 onUnmounted(() => {
@@ -95,6 +95,15 @@ const deleteAll = () => {
     images.value = [];
   }).catch(loader.error).finally(loader.finish);
 };
+
+const timer = setInterval(() => {
+  getPrints().then(({data}) => {
+    images.value = data.images;
+    generateCount.value = data.generate;
+  });
+});
+onUnmounted(() => {});
+clearInterval(timer);
 </script>
 
 <template>

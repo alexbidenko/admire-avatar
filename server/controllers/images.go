@@ -127,7 +127,7 @@ func RemoveImage(w http.ResponseWriter, r *middlewares.AuthorizedRequest) {
 	utils.WriteJsonResponse(w, true)
 }
 
-func GetImage(w http.ResponseWriter, r *middlewares.AuthorizedRequest) {
+func GetImageFile(w http.ResponseWriter, r *middlewares.AuthorizedRequest) {
 	var imageModule modules.ImageModule
 	id := mux.Vars(r.Request)["id"]
 
@@ -147,6 +147,19 @@ func GetImage(w http.ResponseWriter, r *middlewares.AuthorizedRequest) {
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
+}
+
+func GetImage(w http.ResponseWriter, r *middlewares.AuthorizedRequest) {
+	var imageModule modules.ImageModule
+	id := mux.Vars(r.Request)["id"]
+
+	image, err := imageModule.Find(r.User.ID, id)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusNotFound)
+		return
+	}
+
+	utils.WriteJsonResponse(w, image)
 }
 
 func GetImageByEmail(w http.ResponseWriter, r *http.Request) {

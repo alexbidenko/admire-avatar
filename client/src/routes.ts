@@ -8,6 +8,7 @@ import GeneratePage from '~/pages/GeneratePage.vue';
 import PasswordPage from '~/pages/PasswordPage.vue';
 import PrintsPage from '~/pages/PrintsPage.vue';
 import NotFoundPage from '~/pages/NotFoundPage.vue';
+import OpenImage from '~/pages/OpenImage.vue';
 
 const routes = [
   {
@@ -19,6 +20,11 @@ const routes = [
     path: '/sign-up',
     name: 'Sign-up',
     component: RegistrationPage,
+  },
+  {
+    path: '/images/:id',
+    name: 'OpenImage',
+    component: OpenImage,
   },
   {
     path: '/',

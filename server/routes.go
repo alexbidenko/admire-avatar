@@ -9,6 +9,7 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
+	"text/template"
 )
 
 func initRoutes() http.Handler {
@@ -35,7 +36,8 @@ func initRoutes() http.Handler {
 	s.HandleFunc("/images/{id}/folder/{folderId}", middlewares.Auth(controllers.ImageToFolder)).Methods("PUT")
 	s.HandleFunc("/images/{id}", middlewares.Auth(controllers.RemoveImage)).Methods("DELETE")
 	s.HandleFunc("/images/{id}", middlewares.Auth(controllers.CreateAvatar)).Methods("PUT")
-	s.HandleFunc("/images/{id}", middlewares.Auth(controllers.GetImage)).Methods("GET")
+	s.HandleFunc("/images/{id}/data", middlewares.Auth(controllers.GetImage)).Methods("GET")
+	s.HandleFunc("/images/{id}", middlewares.Auth(controllers.GetImageFile)).Methods("GET")
 	s.HandleFunc("/images/{offset}/{limit}", middlewares.Auth(controllers.GetPaginatedImages)).Methods("GET")
 
 	s.HandleFunc("/prints", middlewares.Auth(controllers.GetPrints)).Methods("GET")
@@ -69,7 +71,15 @@ func initRoutes() http.Handler {
 
 			_, err := os.Stat(path)
 			if os.IsNotExist(err) {
-				http.ServeFile(w, r, filepath.Join("dist", "index.html"))
+				t := template.New("index.html")
+				parser, _ := t.ParseFiles("dist/index.html")
+
+				err = parser.Execute(w, map[string]string{
+					"og_image": "https://picart.admire.social/api" + r.URL.Path + "/data",
+				})
+				if err != nil {
+					http.Error(w, err.Error(), http.StatusInternalServerError)
+				}
 				return
 			} else if err != nil {
 				http.Error(w, err.Error(), http.StatusInternalServerError)

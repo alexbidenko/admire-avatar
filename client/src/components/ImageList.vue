@@ -197,6 +197,12 @@ const renderLabel = (option: UserType) => (h as any)(
     ),
   ],
 );
+
+const copyLink = () => {
+  navigator.clipboard.writeText(`${location.origin}/images/${selectedImage.value?.id}`).then(() => {
+    message.success('Ссылка скопирована в буфер обмена');
+  });
+};
 </script>
 
 <template>
@@ -262,6 +268,9 @@ const renderLabel = (option: UserType) => (h as any)(
           @search="handleSearch"
           v-model:value="selectedUser"
       />
+      <n-button type="info" @click="copyLink" style="margin-top: 16px">
+        Скопировать ссылку
+      </n-button>
       <template #footer>
         <n-button-group style="display: flex; justify-content: end">
           <n-button type="warning" @click="cancel">
