@@ -101,7 +101,7 @@ const timer = setInterval(() => {
     images.value = data.images;
     generateCount.value = data.generate;
   });
-});
+}, 8000);
 onUnmounted(() => {});
 clearInterval(timer);
 </script>
