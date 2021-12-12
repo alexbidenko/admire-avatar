@@ -141,7 +141,7 @@ const shareImageRequest = () => {
   });
 };
 
-const renderSingleSelectTag = (data: { option: SelectBaseOption<UserType> }) => (h as any)(
+const renderSingleSelectTag: any = (data: { option: SelectBaseOption<UserType> }) => (h as any)(
   'div',
   {
     style: {
@@ -151,7 +151,7 @@ const renderSingleSelectTag = (data: { option: SelectBaseOption<UserType> }) => 
   },
   [
     h(NAvatar, {
-      src: `/api/admire-avatar/${md5(data.option.email)}`,
+      src: `/api/admire-avatar/${(md5 as any)(data.option.email)}`,
       round: true,
       size: 24,
       style: {

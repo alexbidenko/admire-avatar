@@ -96,7 +96,7 @@ ws.onmessage = (e: MessageEvent<string>) => {
   });
 };
 
-const navigate = (_: string, item: { to: string }) => {
+const navigate = (_: string, item: any) => {
   router.push(item.to);
   showMenu.value = false;
 };
