@@ -2,6 +2,7 @@
 import {
   NConfigProvider, NLayout, darkTheme, NLoadingBarProvider, NMessageProvider, NDialogProvider, NNotificationProvider,
 } from 'naive-ui';
+import AnimatedLogo from './components/AnimatedLogo.vue';
 </script>
 
 <template>
@@ -17,6 +18,8 @@ import {
                 </transition>
               </router-view>
             </n-layout>
+
+            <AnimatedLogo />
           </n-message-provider>
         </n-notification-provider>
       </n-dialog-provider>

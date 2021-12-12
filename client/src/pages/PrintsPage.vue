@@ -104,7 +104,7 @@ const deleteAll = () => {
       <n-input-group>
         <n-input placeholder="Поисковая фраза" v-model:value="phrase" />
         <n-select placeholder="Тема" v-model:value="tag" :options="tags" class="printsPage__select" />
-        <n-input-number v-model:value="count" :min="1" />
+        <n-input-number v-model:value="count" :min="1" style="width: 140px" />
       </n-input-group>
       <n-button-group style="margin-top: 16px">
         <n-button @click="generate" type="primary">Сгенерировать</n-button>
@@ -164,7 +164,7 @@ const deleteAll = () => {
 
   &__select {
     width: fit-content;
-    min-width: 135px;
+    min-width: 160px;
   }
 }
 </style>
