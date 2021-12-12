@@ -72,7 +72,7 @@ getUser().then(({data}) => {
   store.commit('setAvatar', store.state.avatar + 1);
 });
 
-const ws = new WebSocket(`${location.protocol === 'https' ? 'wss' : 'ws'}://${location.host}/api/user/channel`);
+const ws = new WebSocket(`${location.protocol === 'https:' ? 'wss' : 'ws'}://${location.host}/api/user/channel`);
 
 ws.onmessage = (e: MessageEvent<string>) => {
   const message = JSON.parse(e.data);

@@ -29,7 +29,7 @@ const submit = () => {
 
 <template>
   <div class="authPage">
-    <n-card title="Admire Avatar">
+    <n-card title="PicArt">
       <form @submit.prevent="submit">
         <n-space vertical>
           Email

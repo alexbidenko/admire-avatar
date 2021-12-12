@@ -29,7 +29,7 @@ const tags = ref<{ value: string; label: string }[]>([]);
 const images = ref<ImageType[]>([]);
 const generateCount = ref(0);
 
-const ws = new WebSocket(`${location.protocol === 'https' ? 'wss' : 'ws'}://${location.host}/api/prints/channel`);
+const ws = new WebSocket(`${location.protocol === 'https:' ? 'wss' : 'ws'}://${location.host}/api/prints/channel`);
 
 ws.onmessage = (e: MessageEvent<string>) => {
   const image = JSON.parse(e.data);
