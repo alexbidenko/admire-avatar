@@ -97,7 +97,13 @@ ws.onmessage = (e: MessageEvent<string>) => {
 };
 
 const navigate = (_: string, item: any) => {
-  router.push(item.to);
+  if (item.to) router.push(item.to);
+  else if (item.key === 'logout') {
+    logout().then(() => {
+      store.commit('logout');
+      router.push('/auth');
+    });
+  }
   showMenu.value = false;
 };
 
@@ -157,7 +163,7 @@ onResize();
         </template>
         <n-menu
             :on-update:value="navigate"
-            :options="LINKS"
+            :options="[...LINKS, { key: 'divider-1', type: 'divider' }, ...OPTIONS]"
         />
       </n-drawer-content>
     </n-drawer>
