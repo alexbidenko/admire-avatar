@@ -102,8 +102,9 @@ const timer = setInterval(() => {
     generateCount.value = data.generate;
   });
 }, 8000);
-onUnmounted(() => {});
-clearInterval(timer);
+onUnmounted(() => {
+  clearInterval(timer);
+});
 </script>
 
 <template>
