@@ -43,7 +43,6 @@ jobs:
             ACCESS_TOKEN_SECRET_KEY=${{ secrets.ACCESS_TOKEN_SECRET_KEY }}
             REFRESH_TOKEN_SECRET_KEY=${{ secrets.REFRESH_TOKEN_SECRET_KEY }}
             POSTGRES_PASSWORD=${{ secrets.POSTGRES_PASSWORD }}
-            SERVER_API=${{ secrets.SERVER_API }}
 
       - name: Image digest
         run: echo ${{ steps.docker_build.outputs.digest }}

@@ -7,7 +7,7 @@ export default defineConfig({
   server: {
     proxy: {
       '/api': {
-        'target': 'http://192.168.43.182:7015',
+        'target': 'http://localhost:7015',
         'ws': true,
       },
     },
